@@ -4,7 +4,9 @@ var pg = require('pg');
 
 app.set('port', (process.env.PORT || 5000));
 
-app.get('/', function (request, response) {
+app.post('/login', function (request, response) {
+    var usuario = request.body.Usuario;
+    var clave = request.body.Clave;
     pg.connect(process.env.DATABASE_URL, function(err, client, done) {
         client.query("SELECT * FROM comprobar_usuario('eze','1234')", function(err, result) {
             done();
@@ -15,8 +17,7 @@ app.get('/', function (request, response) {
             }
             else
             {
-                var resultado = result[0];
-                response.send(resultado);
+                response.send('usuario: ' + usuario + ' clave: ' + clave);
             }
         });
     });
