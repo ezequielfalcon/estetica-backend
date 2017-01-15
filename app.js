@@ -21,7 +21,7 @@ app.post('/login', function (req, res) {
     pg.connect(process.env.DATABASE_URL, function(err, client, done){
         client.query({
             text: "SELECT * FROM comprobar_usuario($1,$2);",
-            values:[user, pass]
+            values:[user, hash]
         }, function(err, result){
             done();
             if (err){
@@ -31,7 +31,6 @@ app.post('/login', function (req, res) {
             else{
                 if (result.rows[0].comprobar_usuario){
                     res.send("vamo carajo");
-                    console.log (hash);
                     console.log("Inicio de sesión de usuario " + user);
                 }
                 else{
