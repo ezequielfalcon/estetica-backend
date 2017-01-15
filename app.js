@@ -10,10 +10,10 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 
 app.set('port', (process.env.PORT || 5000));
 
-app.post('/login', function (request, response) {
-    var usuario = request.body.usuario;
-    var clave = request.body.clave;
-    response.send(usuario);
+app.post('/login', function (req, res) {
+    var usuario = req.body.usuario;
+    var clave = req.body.clave;
+    res.send(usuario);
 });
 
 app.listen(app.get('port'), function() {
