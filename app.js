@@ -26,7 +26,7 @@ app.post('/login', function (req, res) {
             }
             else{
                 var logueado = result[0];
-                console.log(result[0]);
+                console.log(result);
                 if (logueado == "1") res.send('errLog');
                 else res.send('ok');
             }
