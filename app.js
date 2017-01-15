@@ -5,8 +5,8 @@ var pg = require('pg');
 app.set('port', (process.env.PORT || 5000));
 
 app.post('/login', function (request, response) {
-    var usuario = request.header.Usuario;
-    var clave = request.header.Clave;
+    var usuario = request.body.usuario;
+    var clave = request.body.clave;
     pg.connect(process.env.DATABASE_URL, function(err, client, done) {
         client.query("SELECT * FROM comprobar_usuario('eze','1234')", function(err, result) {
             done();
