@@ -18,7 +18,6 @@ app.post('/login', function (req, res) {
     var user = req.body.usuario;
     var pass = req.body.clave;
     var hash = bcrypt.hashSync(pass, salt);
-    console.log(hash);
     pg.connect(process.env.DATABASE_URL, function(err, client, done){
         client.query({
             text: "SELECT * FROM comprobar_usuario($1,$2);",
