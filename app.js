@@ -8,8 +8,6 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
 
-app.use(express.json());       // to support JSON-encoded bodies
-app.use(express.urlencoded()); // to support URL-encoded bodies
 app.set('port', (process.env.PORT || 5000));
 
 app.post('/login', function (request, response) {
