@@ -46,6 +46,7 @@ app.post('/login', function (req, res) {
                 return null;
             }
             else{
+                console.log(result);
                 if (result.rows[0].nombre =! null){
                     return result.rows[0].clave;
                 }
