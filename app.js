@@ -25,7 +25,7 @@ app.post('/login', function (req, res) {
                 res.send("err");
             }
             else{
-                console.log(result.rows[0]);
+                console.log(result.rows[0].comprobar_usuario);
                 res.send('ok');
             }
         })
