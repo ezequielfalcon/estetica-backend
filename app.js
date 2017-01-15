@@ -16,7 +16,7 @@ app.post('/login', function (req, res) {
     var pass = req.body.clave;
     pg.connect(process.env.DATABASE_URL, function(err, client, done){
         client.query({
-            text: "SELECT * FROM comprobar_usuario('$1','$2');",
+            text: "SELECT * FROM comprobar_usuario($1,$2);",
             values:[user, pass]
         }, function(err, result){
             done();
