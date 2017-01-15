@@ -26,7 +26,8 @@ app.post('/login', function (req, res) {
             }
             else{
                 var logueado = result[0];
-                res.send('logueado: ' + logueado);
+                if (logueado == "1") res.send('errLog');
+                else res.send('ok');
             }
         })
     })
