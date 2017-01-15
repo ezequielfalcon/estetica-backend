@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 
 app.set('port', (process.env.PORT || 5000));
 
-app.post('/login', function (req, res) {
+app.post('/createlogin', function (req, res) {
     var user = req.body.usuario;
     var pass = req.body.clave;
     var hash = bcrypt.hashSync(pass, salt);
@@ -28,17 +28,53 @@ app.post('/login', function (req, res) {
                 console.log(err);
                 res.send("err");
             }
+        })
+    })
+});
+
+app.post('/login', function (req, res) {
+    var user = req.body.usuario;
+    var pass = req.body.clave;
+
+    var hashDb = pg.connect(process.env.DATABASE_URL, function(err, client, done){
+        client.query({
+            text: "SELECT * FROM usuarios WHERE nombre = $1;",
+            values:[user]
+        }, function(err, result){
+            done();
+            if (err){
+                console.log(err);
+                return null;
+            }
             else{
-                if (result.rows[0].comprobar_usuario){
-                    res.send("vamo carajo");
-                    console.log("Inicio de sesión de usuario " + user);
+                if (result.rows[0].nombre =! null){
+                    return result.rows[0].clave;
                 }
                 else{
-                    res.send("logout");
-                    console.log("Error de inicio de sesión, usuario " + user);
+                    return null;
                 }
             }
         })
+    });
+
+    if (hashDb == null){
+        console.log("Usuario inexistente intentó iniciar sesión: " + user);
+        res.send("notok");
+    }
+
+    bcrypt.compare(pass, hashDb, function(err, hashRes){
+        if(err) {
+            console.log(err);
+            res.send("err");
+        }
+        if (hashRes) {
+            console.log("Inicio de sesión por usuario " + user);
+            res.send("ok");
+        }
+        else {
+            console.log("Inicio de sesión no válido para " + user);
+            res.send("notok");
+        }
     })
 });
 
