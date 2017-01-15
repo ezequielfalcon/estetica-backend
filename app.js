@@ -25,8 +25,14 @@ app.post('/login', function (req, res) {
                 res.send("err");
             }
             else{
-                console.log(result.rows[0].comprobar_usuario);
-                res.send('ok');
+                if (result.rows[0].comprobar_usuario){
+                    res.send("vamo carajo");
+                    console.log("Inicio de sesión de usuario" + user);
+                }
+                else{
+                    res.send("logout");
+                    console.log("Error de inicio de sesión, usuario " + user);
+                }
             }
         })
     })
