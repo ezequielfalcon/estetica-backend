@@ -35,7 +35,6 @@ app.post('/createlogin', function (req, res) {
 app.post('/login', function (req, res) {
     var user = req.body.usuario;
     var pass = req.body.clave;
-
     var hashDb = pg.connect(process.env.DATABASE_URL, function(err, client, done){
         client.query({
             text: "SELECT * FROM usuarios WHERE nombre = $1;",
@@ -60,6 +59,7 @@ app.post('/login', function (req, res) {
     if (hashDb == null){
         console.log("Usuario inexistente intentó iniciar sesión: " + user);
         res.send("notok");
+        return;
     }
 
     bcrypt.compare(pass, hashDb, function(err, hashRes){
