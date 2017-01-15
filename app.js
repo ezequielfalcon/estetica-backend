@@ -11,9 +11,9 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 app.set('port', (process.env.PORT || 5000));
 
 app.post('/login', function (req, res) {
-    var usuario = req.body.usuario;
-    var clave = req.body.clave;
-    res.send(usuario);
+    var user = req.body.usuario;
+    var pass = req.body.clave;
+    res.send('asd: ' + user);
 });
 
 app.listen(app.get('port'), function() {
