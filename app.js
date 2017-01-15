@@ -37,7 +37,7 @@ app.post('/login', function (req, res) {
     var pass = req.body.clave;
     var hashDb = pg.connect(process.env.DATABASE_URL, function(err, client, done){
         client.query({
-            text: "SELECT * FROM usuarios WHERE nombre = $1;",
+            text: "SELECT nombre, clave FROM usuarios WHERE nombre = $1;",
             values:[user]
         }, function(err, result){
             done();
