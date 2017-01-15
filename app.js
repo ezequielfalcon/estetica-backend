@@ -15,7 +15,7 @@ app.get('/', function (request, response) {
             }
             else
             {
-                var resultado = result[0][0];
+                var resultado = result[0];
                 response.send(resultado);
             }
         });
