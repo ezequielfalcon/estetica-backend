@@ -6,7 +6,8 @@
   "dependencies": {
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
-    "pg": "4.x"
+    "pg": "4.x",
+    "bcrypt": "latest"
   },
   "devDependencies": {},
   "scripts": {
