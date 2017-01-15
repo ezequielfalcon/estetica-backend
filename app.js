@@ -46,7 +46,7 @@ app.post('/login', function (req, res) {
                 return null;
             }
             else{
-                if (result.rows[0].nombre != null){
+                if (result.rows[0].nombre == user){
                     return result.rows[0].clave;
                 }
                 else{
