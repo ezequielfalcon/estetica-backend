@@ -3,34 +3,13 @@ var app = express();
 var pg = require('pg');
 var bodyParser = require('body-parser');
 var bcrypt = require('bcrypt');
-// Generate a salt
-var salt = bcrypt.genSaltSync(10);
+var jwt    = require('jsonwebtoken');
 
-app.use( bodyParser.json() );       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-    extended: true
-}));
+app.use( bodyParser.json() );
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
 app.set('port', (process.env.PORT || 5000));
-
-app.post('/createlogin', function (req, res) {
-    var user = req.body.usuario;
-    var pass = req.body.clave;
-    var hash = bcrypt.hashSync(pass, salt);
-    pg.connect(process.env.DATABASE_URL, function(err, client, done){
-        client.query({
-            text: "SELECT * FROM comprobar_usuario($1,$2);",
-            values:[user, hash]
-        }, function(err, result){
-            done();
-            if (err){
-                console.log(err);
-                res.send("err");
-            }
-        })
-    })
-});
 
 app.post('/login', function (req, res) {
     var user = req.body.usuario;
@@ -44,28 +23,31 @@ app.post('/login', function (req, res) {
             done();
             if (err){
                 console.log(err);
-                res.send("err");
+                res.json({success: false, message: err});
             }
             if (result.rows[0] != null){
                 hashDb = result.rows[0].clave;
                 bcrypt.compare(pass, hashDb, function(err, hashRes){
                     if(err) {
                         console.log(err);
-                        res.send("err");
+                        res.json({success: false, message: err});
                     }
                     if (hashRes) {
                         console.log("Inicio de sesión por usuario " + user);
-                        res.send("ok");
+                        var token = jwt.sign(user, process.env.JWT_SECRET, {
+                            expiresInMinutes: 1440
+                        });
+                        res.json({success: true, message: "sesión iniciada", token: token});
                     }
                     else {
                         console.log("Inicio de sesión no válido para " + user);
-                        res.send("notok");
+                        res.json({success: false, message: "credenciales no válidas!"})
                     }
                 })
             }
             else{
                 console.log("Usuario inexistente intentó iniciar sesión: " + user);
-                res.send("notok");
+                res.json({success: false, message: "credenciales no válidas!"})
             }
         })
     });
