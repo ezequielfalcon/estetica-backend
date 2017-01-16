@@ -44,9 +44,9 @@ app.post('/login', function (req, res) {
             done();
             if (err){
                 console.log(err);
-                return;
+                res.send("err");
             }
-            if (result.rows[0].nombre == user){
+            else if (result.rows[0].nombre == user){
                 hashDb = result.rows[0].clave;
                 bcrypt.compare(pass, hashDb, function(err, hashRes){
                     if(err) {
@@ -69,8 +69,6 @@ app.post('/login', function (req, res) {
             }
         })
     });
-
-
 });
 
 app.listen(app.get('port'), function() {
