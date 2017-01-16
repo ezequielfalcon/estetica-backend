@@ -46,35 +46,31 @@ app.post('/login', function (req, res) {
                 console.log(err);
                 return;
             }
-            console.log("db: " + result.rows[0].nombre + ".");
-            console.log("req: " + user + ".");
             if (result.rows[0].nombre == user){
                 hashDb = result.rows[0].clave;
-                console.log("iguales, clave de DB: " + hashDb);
+                bcrypt.compare(pass, hashDb, function(err, hashRes){
+                    if(err) {
+                        console.log(err);
+                        res.send("err");
+                    }
+                    if (hashRes) {
+                        console.log("Inicio de sesión por usuario " + user);
+                        res.send("ok");
+                    }
+                    else {
+                        console.log("Inicio de sesión no válido para " + user);
+                        res.send("notok");
+                    }
+                })
+            }
+            else{
+                console.log("Usuario inexistente intentó iniciar sesión: " + user);
+                res.send("notok");
             }
         })
     });
 
-    if (hashDb == null){
-        console.log("Usuario inexistente intentó iniciar sesión: " + user);
-        res.send("notok");
-        return;
-    }
 
-    bcrypt.compare(pass, hashDb, function(err, hashRes){
-        if(err) {
-            console.log(err);
-            res.send("err");
-        }
-        if (hashRes) {
-            console.log("Inicio de sesión por usuario " + user);
-            res.send("ok");
-        }
-        else {
-            console.log("Inicio de sesión no válido para " + user);
-            res.send("notok");
-        }
-    })
 });
 
 app.listen(app.get('port'), function() {
