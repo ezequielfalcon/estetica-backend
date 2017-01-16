@@ -10,10 +10,11 @@ module.exports = function (db) {
 
     function usuariosFunc (req, res, next){
         var token = req.body.token || req.query.token || req.headers['x-access-token'];
+        console.log("Token recibido: " + token);
         if (token){
             jwt.verify(token, process.env.DATABASE_URL, function(err, decoded){
                 if (err){
-                    console.log("Error de autenticación, token inválido!");
+                    console.log("Error de autenticación, token inválido!\n" + err);
                     res.json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{

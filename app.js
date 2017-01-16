@@ -14,9 +14,13 @@ var seguridad = require('./server/seguridad.js')(db);
 var usuarios = require('./server/usuarios.js')(db);
 
 
-app.post('/login', seguridad.login);
+app.post('/api/login', seguridad.login);
 
-app.get('/usuarios', usuarios.usuarios);
+app.get('/api/usuarios', usuarios.usuarios);
+
+app.get('/api', function (req, res) {
+    res.json({mensaje: "Backend del sistema!!"})
+});
 
 app.listen(app.get('port'), function() {
     console.log('Backend escuchando en puerto ', app.get('port'));
