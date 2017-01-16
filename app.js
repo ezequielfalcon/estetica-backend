@@ -34,9 +34,7 @@ app.post('/login', function (req, res) {
                     }
                     if (hashRes) {
                         console.log("Inicio de sesión por usuario " + user);
-                        var token = jwt.sign(user, process.env.JWT_SECRET, {
-                            expiresIn: 86400
-                        });
+                        var token = jwt.sign(user, process.env.JWT_SECRET);
                         res.json({success: true, message: "sesión iniciada", token: token});
                     }
                     else {
