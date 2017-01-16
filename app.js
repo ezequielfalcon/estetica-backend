@@ -46,10 +46,11 @@ app.post('/login', function (req, res) {
                 console.log(err);
                 return;
             }
-            console.log("db: " + result.rows[0].nombre);
-            console.log("req: " + user);
+            console.log("db: " + result.rows[0].nombre + ".");
+            console.log("req: " + user + ".");
             if (result.rows[0].nombre == user){
                 hashDb = result.rows[0].clave;
+                console.log("iguales, clave de DB: " + hashDb);
             }
         })
     });
