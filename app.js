@@ -46,7 +46,7 @@ app.post('/login', function (req, res) {
                 console.log(err);
                 res.send("err");
             }
-            else if (result.rows[0].nombre == user){
+            if (result.rows[0] != null){
                 hashDb = result.rows[0].clave;
                 bcrypt.compare(pass, hashDb, function(err, hashRes){
                     if(err) {
