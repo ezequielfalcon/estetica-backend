@@ -12,7 +12,7 @@ module.exports = function (db) {
         var token = req.headers['x-access-token'];
         console.log("Token recibido: " + token + '..');
         if (token){
-            jwt.verify(token, process.env.DATABASE_URL, function(err, decoded){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
                     console.log("Error de autenticación, token inválido!\n" + err);
                     res.json({resultado: false, mensaje: "Error de autenticación"});
