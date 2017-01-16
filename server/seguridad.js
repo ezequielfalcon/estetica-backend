@@ -4,6 +4,7 @@
 var bcrypt = require('bcrypt');
 var pgp = require("pg-promise");
 var db = pgp(process.env.DATABASE_URL);
+var jwt    = require('jsonwebtoken');
 
 module.exports= {
     login: login
