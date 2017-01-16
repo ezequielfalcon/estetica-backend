@@ -18,7 +18,7 @@ module.exports = function (db) {
                     res.json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
-                    console.log("Usuario " + decoded.playload.nombre + " autorizado");
+                    console.log("Usuario " + decoded.nombre + " autorizado");
                     db.many("SELECT usuarios.nombre, roles.nombre rol FROM usuarios INNER JOIN roles ON usuarios.id_rol = roles.id;")
                         .then(function(data){
                             res.json({resultado: true, datos: data});
