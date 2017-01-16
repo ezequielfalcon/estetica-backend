@@ -30,6 +30,7 @@ module.exports= function(db) {
                             rol: data.rol
                         };
                         var token = jwt.sign(usuarioDb, process.env.JWT_SECRET);
+                        console.log("Token generado: " + token + '..');
                         res.json({
                             resultado: true,
                             mensaje: "Sesión iniciada",
