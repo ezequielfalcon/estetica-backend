@@ -11,7 +11,7 @@ app.set('port', (process.env.PORT || 5000));
 var seguridad = require('./server/seguridad.js');
 
 
-app.post('/login', seguridad.login(req,res));
+app.post('/login', seguridad.login);
 
 app.listen(app.get('port'), function() {
     console.log('Backend escuchando en puerto ', app.get('port'));
