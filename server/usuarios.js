@@ -8,7 +8,7 @@ module.exports = function (db) {
 
     module.usuarios = usuariosFunc;
 
-    function usuariosFunc (req, res, next){
+    function usuariosFunc (req, res){
         var token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){

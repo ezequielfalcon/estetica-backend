@@ -11,7 +11,6 @@ module.exports= function(db) {
 
     function login(req, res, next){
         var user = req.body.usuario;
-        var pass = req.body.clave;
         db.oneOrNone("SELECT usuarios.nombre, usuarios.clave, roles.nombre rol FROM usuarios INNER JOIN roles ON usuarios.id_rol = roles.id WHERE usuarios.nombre = $1;", user)
             .then(function(data){
                 if (data == null){
