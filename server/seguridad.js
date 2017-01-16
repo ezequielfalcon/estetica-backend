@@ -2,7 +2,7 @@
  * Created by eze on 16/01/17.
  */
 var bcrypt = require('bcrypt');
-var pgp = require("pg-promise");
+var pgp = require("pg-promise")();
 var db = pgp(process.env.DATABASE_URL);
 var jwt    = require('jsonwebtoken');
 
