@@ -35,7 +35,8 @@ app.post('/createlogin', function (req, res) {
 app.post('/login', function (req, res) {
     var user = req.body.usuario;
     var pass = req.body.clave;
-    var hashDb = pg.connect(process.env.DATABASE_URL, function(err, client, done){
+    var hashDb = null;
+    pg.connect(process.env.DATABASE_URL, function(err, client, done){
         client.query({
             text: "SELECT nombre, clave FROM usuarios WHERE nombre = $1;",
             values:[user]
@@ -43,15 +44,10 @@ app.post('/login', function (req, res) {
             done();
             if (err){
                 console.log(err);
-                return null;
+                return;
             }
-            else{
-                if (result.rows[0].nombre == user){
-                    return result.rows[0].clave;
-                }
-                else{
-                    return null;
-                }
+            if (result.rows[0].nombre == user){
+                hashDb = result.rows[0].clave;
             }
         })
     });
