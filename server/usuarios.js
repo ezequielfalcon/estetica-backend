@@ -9,7 +9,7 @@ module.exports = function (db) {
     module.usuarios = usuariosFunc;
 
     function usuariosFunc (req, res, next){
-        var token = req.body.token || req.query.token || req.headers['x-access-token'];
+        var token = req.headers['x-access-token'];
         console.log("Token recibido: " + token + '..');
         if (token){
             jwt.verify(token, process.env.DATABASE_URL, function(err, decoded){
