@@ -17,6 +17,7 @@ var usuarios = require('./server/usuarios.js')(db);
 app.post('/api/login', seguridad.login);
 
 app.get('/api/usuarios', usuarios.usuarios);
+app.post('api/usuarios', usuarios.nuevoUsuario);
 
 app.get('/api', function (req, res) {
     res.json({mensaje: "Backend del sistema!!"})
