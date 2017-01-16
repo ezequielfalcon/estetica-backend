@@ -8,7 +8,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('port', (process.env.PORT || 5000));
 
 
-var seguridad = require('/server/seguridad.js');
+var seguridad = require('./server/seguridad.js');
 
 
 app.post('/login', seguridad.login(req,res));
