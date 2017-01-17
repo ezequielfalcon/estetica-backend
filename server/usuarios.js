@@ -8,6 +8,99 @@ module.exports = function (db) {
 
     module.usuarios = usuariosFunc;
     module.nuevoUsuario = nuevoUsuario;
+    module.borrarUsuario = borrarUsuario;
+    module.modificarUsuario = modificarUsuario;
+
+    function modificarUsuario(req, res){
+        var token = req.headers['x-access-token'];
+        if (token){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
+                if (err){
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.json({resultado: false, mensaje: "Error de autenticación"});
+                }
+                else{
+                    if (decoded.rol == "admin"){
+                        var rolExiste = db.one("SELECT id FROM roles WHERE nombre = $1;", req.body.rol)
+                            .then(function(data){
+                                return data.id;
+                            })
+                            .catch(function(err){
+                                console.log(err);
+                                return null;
+                            });
+                        if (rolExiste == null){
+                            db.one("INSERT INTO roles (nombre) VALUES ($1) RETURNING id;", req.body,rol)
+                                .then(function(data){
+                                    rolExiste = data.id;
+                                })
+                                .catch(function(err){
+                                    console.log(err);
+                                    res.json({resultado: false, mensaje: err});
+                                })
+                        }
+                        db.none("UPDATE usuarios SET clave = $1, rol = $2 WHERE nombre = $3;", req.body.clave, rolExiste, req.params.id)
+                            .then(function(){
+                                console.log("Usuario " + req.params.id + " borrado!!");
+                                res.json({resultado: true, mensaje: "usuario borrado"})
+                            })
+                            .catch(function (err){
+                                console.log(err);
+                                res.json({resultado: false, mensaje: err})
+                            })
+                    }
+                    else{
+                        console.log("Usuario " + decoded.nombre + " no autorizado");
+                        res.json({resultado: false, mensaje:"no tiene permiso para crear usuarios!"});
+                    }
+                }
+            });
+        }
+        else{
+            res.status(403).send({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
+
+    function borrarUsuario(req, res){
+        var token = req.headers['x-access-token'];
+        if (token){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
+                if (err){
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.json({resultado: false, mensaje: "Error de autenticación"});
+                }
+                else{
+                    if (decoded.rol == "admin"){
+                        if (req.params.id != decoded.nombre){
+                            db.none("DELETE FROM usuarios WHERE nombre = $1;", req.params.id)
+                                .then(function(){
+                                    console.log("Usuario " + req.params.id + " borrado!!");
+                                    res.json({resultado: true, mensaje: "usuario borrado"})
+                                })
+                                .catch(function (err){
+                                    console.log(err);
+                                    res.json({resultado: false, mensaje: err})
+                                })
+                        }
+                        else res.json({resultado: false, mensaje: "no se puede borrar a sí mismo"});
+                    }
+                    else{
+                        console.log("Usuario " + decoded.nombre + " no autorizado");
+                        res.json({resultado: false, mensaje:"no tiene permiso para crear usuarios!"});
+                    }
+                }
+            });
+        }
+        else{
+            res.status(403).send({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
 
     function nuevoUsuario (req, res){
         var token = req.headers['x-access-token'];
@@ -20,9 +113,9 @@ module.exports = function (db) {
                 else{
                     if (decoded.rol == "admin"){
                         console.log("Usuario " + decoded.nombre + " autorizado");
-                        var rolExiste = db.one("SELECT id_rol FROM roles WHERE nombre = $1;", req.body.rol)
+                        var rolExiste = db.one("SELECT id FROM roles WHERE nombre = $1;", req.body.rol)
                             .then(function(data){
-                                return data;
+                                return data.id;
                             })
                             .catch(function(err){
                                 console.log(err);
