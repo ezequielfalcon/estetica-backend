@@ -133,6 +133,12 @@ module.exports = function (db) {
                                     console.log("Intento de crear usuario repetido");
                                     res.json({resultado: false, mensaje: "El nombre de usuario ya existe"})
                                 }
+                                if (data.usuario_crear == 'ok'){
+                                    console.log("Usuario creado");
+                                    res.json({resultado: true, mensaje: "Usuario creado"})
+                                }
+                                console.log("Error no especificado: " + data);
+                                res.json({resultado: false, mensaje: "Error no especificado de DB"})
                             })
                             .catch(function (err){
                                 console.log(err);
