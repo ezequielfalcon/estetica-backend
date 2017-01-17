@@ -137,7 +137,7 @@ module.exports = function (db) {
                                     console.log("Usuario creado");
                                     res.json({resultado: true, mensaje: "Usuario creado"})
                                 }
-                                console.log("Error no especificado: " + data);
+                                console.log("Error no especificado: " + data.usuario_crear);
                                 res.json({resultado: false, mensaje: "Error no especificado de DB"})
                             })
                             .catch(function (err){
