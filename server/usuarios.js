@@ -135,7 +135,7 @@ module.exports = function (db) {
                         }
                         var usuarioExiste = db.oneOrNone("SELECT nombre FROM usuarios WHERE nombre = $1", req.body.usuario)
                             .then(function(data){
-                                return req.body.usuario == data.nombre;
+                                return data == null;
                             })
                             .catch(function(err){
                                 console.log(err);
