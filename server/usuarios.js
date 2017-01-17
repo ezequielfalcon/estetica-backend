@@ -115,8 +115,9 @@ module.exports = function (db) {
                 else{
                     if (decoded.rol == "admin"){
                         console.log("Usuario " + decoded.nombre + " autorizado");
-                        var rolExiste = db.one("SELECT id FROM roles WHERE nombre = $1;", req.body.rol)
+                        var rolExiste = db.oneOrNone("SELECT id FROM roles WHERE nombre = $1;", req.body.rol)
                             .then(function(data){
+                                if (data == null) return null;
                                 return data.id;
                             })
                             .catch(function(err){
