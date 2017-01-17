@@ -133,7 +133,7 @@ module.exports = function (db) {
                                     res.json({resultado: false, mensaje: err});
                                 })
                         }
-                        var usuarioExiste = db.one("SELECT nombre FROM usuarios WHERE nombre = $1", req.body.usuario)
+                        var usuarioExiste = db.oneOrNone("SELECT nombre FROM usuarios WHERE nombre = $1", req.body.usuario)
                             .then(function(data){
                                 return req.body.usuario == data.nombre;
                             })
