@@ -109,7 +109,7 @@ module.exports = function (db) {
 
     function nuevoUsuario (req, res){
         var token = req.headers['x-access-token'];
-        if (!req.body.usuario && !req.body.clave && req.body.rol){
+        if (!req.body.usuario || !req.body.clave || req.body.rol){
             console.log("Usuario POST sin todos los datos necesarios");
             res.json({resultado: false, mensaje: "Faltan datos en el POST"})
         }
