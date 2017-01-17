@@ -124,6 +124,7 @@ module.exports = function (db) {
                                 console.log(err);
                                 return null;
                             });
+                        console.log(rolExiste);
                         if (rolExiste == null){
                             db.one("INSERT INTO roles (nombre) VALUES ($1) RETURNING id;", req.body,rol)
                                 .then(function(data){
