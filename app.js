@@ -11,7 +11,7 @@ app.set('port', (process.env.PORT || 5000));
 var db = pgp(process.env.DATABASE_URL);
 
 var seguridad = require('./server/seguridad.js')(db);
-var usuarios = require('./server/usuarios.js')(db);
+var usuarios = require('./server/usuarios.js')(db, pgp);
 
 
 app.post('/api/login', seguridad.login);

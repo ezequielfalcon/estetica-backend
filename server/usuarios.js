@@ -4,7 +4,7 @@
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcrypt');
 
-module.exports = function (db) {
+module.exports = function (db, pgp) {
     var module = {};
 
     module.usuarios = usuariosFunc;
