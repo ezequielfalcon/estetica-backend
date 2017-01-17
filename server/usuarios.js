@@ -109,49 +109,51 @@ module.exports = function (db, pgp) {
 
     function nuevoUsuario (req, res){
         var token = req.headers['x-access-token'];
-        if (!req.body.usuario || !req.body.clave || req.body.rol){
-            console.log("Usuario POST sin todos los datos necesarios");
-            res.json({resultado: false, mensaje: "Faltan datos en el POST"})
-        }
         if (token){
-            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
-                if (err){
-                    console.log("Error de autenticación, token inválido!\n" + err);
-                    res.json({resultado: false, mensaje: "Error de autenticación"});
-                }
-                else{
-                    if (decoded.rol == "admin"){
-                        console.log("Usuario " + decoded.nombre + " autorizado");
-                        var hash = bcrypt.hashSync(req.body.clave, 10);
-                        var qrm = pgp.queryResult;
-                        db.func('usuario_crear', [req.body.usuario, hash, req.body.rol], qrm.one)
-                            .then(function (data){
-                                if (data.usuario_crear == 'error-rol'){
-                                    console.log("Intento de crear usuario con rol no existente!");
-                                    res.json({resultado: false, mensaje: "El rol especificado no existe"})
-                                }
-                                if (data.usuario_crear == 'error-usuario'){
-                                    console.log("Intento de crear usuario repetido");
-                                    res.json({resultado: false, mensaje: "El nombre de usuario ya existe"})
-                                }
-                                if (data.usuario_crear == 'ok'){
-                                    console.log("Usuario creado");
-                                    res.json({resultado: true, mensaje: "Usuario creado"})
-                                }
-                                console.log("Error no especificado: " + data.usuario_crear);
-                                res.json({resultado: false, mensaje: "Error no especificado de DB"})
-                            })
-                            .catch(function (err){
-                                console.log(err);
-                                res.json({resultado: false, mensaje: err})
-                            })
+            if(req.body.usuario && req.body.clave && req.body.rol){
+                jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
+                    if (err){
+                        console.log("Error de autenticación, token inválido!\n" + err);
+                        res.json({resultado: false, mensaje: "Error de autenticación"});
                     }
                     else{
-                        console.log("Usuario " + decoded.nombre + " no autorizado");
-                        res.json({resultado: false, mensaje:"no tiene permiso para crear usuarios!"});
+                        if (decoded.rol == "admin"){
+                            console.log("Usuario " + decoded.nombre + " autorizado");
+                            var hash = bcrypt.hashSync(req.body.clave, 10);
+                            var qrm = pgp.queryResult;
+                            db.func('usuario_crear', [req.body.usuario, hash, req.body.rol], qrm.one)
+                                .then(function (data){
+                                    if (data.usuario_crear == 'error-rol'){
+                                        console.log("Intento de crear usuario con rol no existente!");
+                                        res.json({resultado: false, mensaje: "El rol especificado no existe"})
+                                    }
+                                    if (data.usuario_crear == 'error-usuario'){
+                                        console.log("Intento de crear usuario repetido");
+                                        res.json({resultado: false, mensaje: "El nombre de usuario ya existe"})
+                                    }
+                                    if (data.usuario_crear == 'ok'){
+                                        console.log("Usuario creado");
+                                        res.json({resultado: true, mensaje: "Usuario creado"})
+                                    }
+                                    console.log("Error no especificado: " + data.usuario_crear);
+                                    res.json({resultado: false, mensaje: "Error no especificado de DB"})
+                                })
+                                .catch(function (err){
+                                    console.log(err);
+                                    res.json({resultado: false, mensaje: err})
+                                })
+                        }
+                        else{
+                            console.log("Usuario " + decoded.nombre + " no autorizado");
+                            res.json({resultado: false, mensaje:"no tiene permiso para crear usuarios!"});
+                        }
                     }
-                }
-            });
+                });
+            }
+            else{
+                console.log("Usuario POST sin todos los datos necesarios");
+                res.json({resultado: false, mensaje: "Faltan datos en el POST"})
+            }
         }
         else{
             res.status(403).send({
