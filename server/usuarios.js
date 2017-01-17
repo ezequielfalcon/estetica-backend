@@ -123,7 +123,8 @@ module.exports = function (db) {
                     if (decoded.rol == "admin"){
                         console.log("Usuario " + decoded.nombre + " autorizado");
                         var hash = bcrypt.hashSync(req.body.clave, 10);
-                        db.func('usuario_crear', [req.body.usuario, hash, req.body.rol])
+                        var qrm = pgp.queryResult;
+                        db.func('usuario_crear', [req.body.usuario, hash, req.body.rol], qrm.one)
                             .then(function (data){
                                 if (data.usuario_crear == 'error-rol'){
                                     console.log("Intento de crear usuario con rol no existente!");
