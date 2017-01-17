@@ -2,6 +2,7 @@
  * Created by eze on 16/01/17.
  */
 var jwt = require('jsonwebtoken');
+var bcrypt = require('bcrypt');
 
 module.exports = function (db) {
     var module = {};
@@ -39,7 +40,8 @@ module.exports = function (db) {
                                     res.json({resultado: false, mensaje: err});
                                 })
                         }
-                        db.none("UPDATE usuarios SET clave = $1, rol = $2 WHERE nombre = $3;", req.body.clave, rolExiste, req.params.id)
+                        var hash = bcrypt.hashSync(req.body.clave, 10);
+                        db.none("UPDATE usuarios SET clave = $1, rol = $2 WHERE nombre = $3;", hash, rolExiste, req.params.id)
                             .then(function(){
                                 console.log("Usuario " + req.params.id + " borrado!!");
                                 res.json({resultado: true, mensaje: "usuario borrado"})
