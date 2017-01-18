@@ -52,34 +52,32 @@ module.exports = function (db, pgp) {
                 }
                 else{
                     if (decoded.rol == "admin"){
-                        var rolExiste = db.one("SELECT id FROM roles WHERE nombre = $1;", req.body.rol)
-                            .then(function(data){
-                                return data.id;
-                            })
-                            .catch(function(err){
-                                console.log(err);
-                                return null;
-                            });
-                        if (rolExiste == null){
-                            db.one("INSERT INTO roles (nombre) VALUES ($1) RETURNING id;", req.body,rol)
+                        if (req.body.usuario && req.body.rol){
+                            db.func('usuario_modificar_rol', [req.body.usuario, req.body.rol], qrm.one)
                                 .then(function(data){
-                                    rolExiste = data.id;
+                                    if (data.usuario_modificar_rol == 'error-usuario'){
+                                        res.status(400).json({resultado: false, mensaje: "No se encontró el usuario " + req.body.usuario})
+                                    }
+                                    else if (data.usuario_modificar_rol == 'error-rol'){
+                                        res.status(400).json({resultado: false, mensaje: "No se encuentra el rol " + req.body.rol})
+                                    }
+                                    else if (data.usuario_modificar_rol == 'ok'){
+                                        res.status(200).json({resultado: true, mensaje: "usuario modificado"});
+                                    }
+                                    else{
+                                        console.log("Error de DB en usuario_modificar_rol: " + data);
+                                        res.status(500).json({resultado: false, mensaje: "error no especificado"});
+                                    }
                                 })
                                 .catch(function(err){
                                     console.log(err);
-                                    res.json({resultado: false, mensaje: err});
+                                    res.status(500).json({resultado: false, mensaje: err});
                                 })
                         }
-                        var hash = bcrypt.hashSync(req.body.clave, 10);
-                        db.none("UPDATE usuarios SET clave = $1, rol = $2 WHERE nombre = $3;", hash, rolExiste, req.params.id)
-                            .then(function(){
-                                console.log("Usuario " + req.params.id + " borrado!!");
-                                res.json({resultado: true, mensaje: "usuario borrado"})
-                            })
-                            .catch(function (err){
-                                console.log(err);
-                                res.json({resultado: false, mensaje: err})
-                            })
+                        else{
+                            console.log("Usuario POST sin todos los datos necesarios");
+                            res.status(400).json({resultado: false, mensaje: "Faltan datos en el POST"})
+                        }
                     }
                     else{
                         console.log("Usuario " + decoded.nombre + " no autorizado");
