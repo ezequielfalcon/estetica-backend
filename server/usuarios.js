@@ -26,10 +26,15 @@ module.exports = function (db, pgp) {
                     console.log("Usuario " + decoded.nombre + " autorizado");
                     db.oneOrNone("SELECT usuarios.nombre, roles.nombre rol FROM usuarios INNER JOIN roles ON usuarios.id_rol = roles.id WHERE usuarios.nombre = $1;", req.params.id)
                         .then(function(data){
-                            res.json({resultado: true, datos: data});
+                            if (data){
+                                res.json({resultado: true, datos: data});
+                            }
+                            else{
+                                res.status(404).json({resultado: false, mensaje: "usuario no encontrado"})
+                            }
                         })
                         .catch(function(err){
-                            res.json({resultado: false, mensaje: err})
+                            res.status(500).json({resultado: false, mensaje: err})
                         })
                 }
             });
