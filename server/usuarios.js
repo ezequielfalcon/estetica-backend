@@ -24,7 +24,7 @@ module.exports = function (db, pgp) {
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    db.one("SELECT usuarios.nombre, roles.nombre rol FROM usuarios INNER JOIN roles ON usuarios.id_rol = roles.id WHERE usuarios.nombre = $1;", req.params.id)
+                    db.oneOrNone("SELECT usuarios.nombre, roles.nombre rol FROM usuarios INNER JOIN roles ON usuarios.id_rol = roles.id WHERE usuarios.nombre = $1;", req.params.id)
                         .then(function(data){
                             res.json({resultado: true, datos: data});
                         })
