@@ -126,10 +126,12 @@ module.exports = function (db, pgp) {
                                     if (data.usuario_crear == 'error-rol'){
                                         console.log("Intento de crear usuario con rol no existente!");
                                         res.json({resultado: false, mensaje: "El rol especificado no existe"})
+                                        return;
                                     }
                                     if (data.usuario_crear == 'error-usuario'){
                                         console.log("Intento de crear usuario repetido");
                                         res.json({resultado: false, mensaje: "El nombre de usuario ya existe"})
+                                        return;
                                     }
                                     if (data.usuario_crear == 'ok'){
                                         console.log("Usuario creado");
