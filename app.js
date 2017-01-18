@@ -17,6 +17,7 @@ var usuarios = require('./server/usuarios.js')(db, pgp);
 app.post('/api/login', seguridad.login);
 
 app.get('/api/usuarios', usuarios.usuarios);
+app.get('/api/usuarios/:id', usuarios.usuario);
 app.post('/api/usuarios', usuarios.nuevoUsuario);
 app.delete('/api/usuarios/:id', usuarios.borrarUsuario);
 app.put('/api/usuarios/:id', usuarios.modificarUsuario);
