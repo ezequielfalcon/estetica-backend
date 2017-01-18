@@ -6,6 +6,7 @@ var bcrypt = require('bcrypt');
 
 module.exports = function (db, pgp) {
     var module = {};
+    var qrm = pgp.queryResult;
 
     module.usuarios = usuariosFunc;
     module.nuevoUsuario = nuevoUsuario;
@@ -77,9 +78,8 @@ module.exports = function (db, pgp) {
                 else{
                     if (decoded.rol == "admin"){
                         if (req.params.id != decoded.nombre){
-                            db.func('usuario_borrar', req.params.id)
+                            db.func('usuario_borrar', req.params.id, qrm.one)
                                 .then(function(data){
-                                    console.log(data);
                                     if (data.usuario_borrar == 'ok'){
                                         res.json({resultado: true, mensaje: "Usuario borrado"})
                                     }
@@ -124,7 +124,6 @@ module.exports = function (db, pgp) {
                         if (decoded.rol == "admin"){
                             console.log("Usuario " + decoded.nombre + " autorizado");
                             var hash = bcrypt.hashSync(req.body.clave, 10);
-                            var qrm = pgp.queryResult;
                             db.func('usuario_crear', [req.body.usuario, hash, req.body.rol], qrm.one)
                                 .then(function (data){
                                     if (data.usuario_crear == 'error-rol'){
