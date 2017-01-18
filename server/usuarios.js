@@ -20,7 +20,7 @@ module.exports = function (db, pgp) {
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
                     console.log("Error de autenticación, token inválido!\n" + err);
-                    res.json({resultado: false, mensaje: "Error de autenticación"});
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
@@ -35,7 +35,7 @@ module.exports = function (db, pgp) {
             });
         }
         else{
-            res.status(403).send({
+            res.status(401).json({
                 resultado: false,
                 mensaje: 'No token provided.'
             });
@@ -48,7 +48,7 @@ module.exports = function (db, pgp) {
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
                     console.log("Error de autenticación, token inválido!\n" + err);
-                    res.json({resultado: false, mensaje: "Error de autenticación"});
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
                     if (decoded.rol == "admin"){
@@ -83,13 +83,13 @@ module.exports = function (db, pgp) {
                     }
                     else{
                         console.log("Usuario " + decoded.nombre + " no autorizado");
-                        res.json({resultado: false, mensaje:"no tiene permiso para crear usuarios!"});
+                        res.status(403).json({resultado: false, mensaje:"no tiene permiso para crear usuarios!"});
                     }
                 }
             });
         }
         else{
-            res.status(403).send({
+            res.status(401).send({
                 resultado: false,
                 mensaje: 'No token provided.'
             });
@@ -102,7 +102,7 @@ module.exports = function (db, pgp) {
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
                     console.log("Error de autenticación, token inválido!\n" + err);
-                    res.json({resultado: false, mensaje: "Error de autenticación"});
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
                     if (decoded.rol == "admin"){
@@ -127,13 +127,13 @@ module.exports = function (db, pgp) {
                     }
                     else{
                         console.log("Usuario " + decoded.nombre + " no autorizado");
-                        res.json({resultado: false, mensaje:"no tiene permiso para borrar usuarios!"});
+                        res.status(403).json({resultado: false, mensaje:"no tiene permiso para borrar usuarios!"});
                     }
                 }
             });
         }
         else{
-            res.status(403).send({
+            res.status(401).send({
                 resultado: false,
                 mensaje: 'No token provided.'
             });
@@ -147,7 +147,7 @@ module.exports = function (db, pgp) {
                 jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                     if (err){
                         console.log("Error de autenticación, token inválido!\n" + err);
-                        res.json({resultado: false, mensaje: "Error de autenticación"});
+                        res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                     }
                     else{
                         if (decoded.rol == "admin"){
@@ -181,18 +181,18 @@ module.exports = function (db, pgp) {
                         }
                         else{
                             console.log("Usuario " + decoded.nombre + " no autorizado");
-                            res.json({resultado: false, mensaje:"no tiene permiso para crear usuarios!"});
+                            res.status(403).json({resultado: false, mensaje:"no tiene permiso para crear usuarios!"});
                         }
                     }
                 });
             }
             else{
                 console.log("Usuario POST sin todos los datos necesarios");
-                res.json({resultado: false, mensaje: "Faltan datos en el POST"})
+                res.status(400).json({resultado: false, mensaje: "Faltan datos en el POST"})
             }
         }
         else{
-            res.status(403).send({
+            res.status(401).send({
                 resultado: false,
                 mensaje: 'No token provided.'
             });
@@ -205,7 +205,7 @@ module.exports = function (db, pgp) {
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
                     console.log("Error de autenticación, token inválido!\n" + err);
-                    res.json({resultado: false, mensaje: "Error de autenticación"});
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
@@ -220,7 +220,7 @@ module.exports = function (db, pgp) {
             });
         }
         else{
-            res.status(403).send({
+            res.status(401).send({
                 resultado: false,
                 mensaje: 'No token provided.'
             });

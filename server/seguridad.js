@@ -15,7 +15,7 @@ module.exports= function(db) {
             .then(function(data){
                 if (data == null){
                     console.log("Usuario inexistente intentó inciar sesión: " + user);
-                    res.json({
+                    res.status(400).json({
                         resultado: false,
                         mensaje: "El usuario no existe"
                     })
@@ -37,7 +37,7 @@ module.exports= function(db) {
                     }
                     else{
                         console.log("Inicio de sesión no válida por usuario " + user);
-                        res.json({
+                        res.status(401).json({
                             resultado: false,
                             mensaje: "Credenciales no válidas"
                         })
