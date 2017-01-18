@@ -79,11 +79,14 @@ module.exports = function (db, pgp) {
                         if (req.params.id != decoded.nombre){
                             db.func('usuario_borrar', req.params.id)
                                 .then(function(data){
-                                    if (data.usuario_borrar == true){
+                                    if (data.usuario_borrar == 'ok'){
                                         res.json({resultado: true, mensaje: "Usuario borrado"})
                                     }
-                                    else{
+                                    else if (data.usuario_borrar == 'error-usuario'){
                                         res.json({resultado: false, mensaje:"No se encuentra el usuario " + req.params.id})
+                                    }
+                                    else{
+                                        res.json({resultado: false, mensaje: "Error no especificado: " + data.usuario_borrar})
                                     }
                                 })
                                 .catch(function(err){
