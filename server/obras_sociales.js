@@ -27,12 +27,8 @@ module.exports = function(db, pgp){
                                     if (data.obra_social_crear == 'error-obra'){
                                         res.status(400).json({resultado: false, mensaje: "ya existe una Obra Social con ese nombre"})
                                     }
-                                    else if (data.obra_social_crear == 'ok') {
+                                    else {
                                         res.json({resultado: true, mensaje: "Obra Social creada", id: data.obra_social_crear})
-                                    }
-                                    else{
-                                        console.log("Error en crear_obra_social: " + data.obra_social_crear);
-                                        res.status(500).json({resultado: false, mensaje: "error no especificado:" + data.obra_social_crear})
                                     }
                                 })
                         }
