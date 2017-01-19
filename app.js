@@ -26,8 +26,8 @@ app.put('/api/usuarios/:id', usuarios.modificarUsuario);
 
 
 //obras sociales
-app.get('/api/obras_sociales');
-app.get('/api/obras_sociales/:id');
+app.get('/api/obras_sociales', obras_sociales.traer);
+app.get('/api/obras_sociales/:id', obras_sociales.traer);
 app.post('/api/obras_sociales', obras_sociales.crear);
 app.put('/api/obras_sociales/:id');
 app.delete('/api/obras_sociales/:id', obras_sociales.borrar);

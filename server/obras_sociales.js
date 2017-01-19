@@ -9,6 +9,46 @@ module.exports = function(db, pgp){
 
     module.crear = crear;
     module.borrar = borrar;
+    module.traer = traer;
+
+    function traer(req,res){
+        var token = req.headers['x-access-token'];
+        if (token){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
+                if (err){
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
+                }
+                else{
+                    console.log("Usuario " + decoded.nombre + " autorizado");
+                    if (req.params.id){
+                        db.oneOrNone("SELECT * FROM obras_sociales WHERE nombre = $1", req.params.id)
+                            .then(function(data){
+                                if (data){
+                                    res.json({resultado: true, datos: data})
+                                }
+                                else {
+                                    res.status(404).json({resultado: false, mensaje: "no se encuentra la obra docial",})
+                                }
+                            })
+                    }
+                    else{
+                        db.manyOrNone("SELECT * FROM obras_sociales")
+                            .then(function (data){
+                                res.json({resultado: true, datos: data})
+                            })
+
+                    }
+                }
+            });
+        }
+        else{
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
 
     function crear(req, res){
         var token = req.headers['x-access-token'];
@@ -73,7 +113,7 @@ module.exports = function(db, pgp){
                                         res.status(400).json({resultado: false, mensaje: "La obra social está siendo usada por algún paciente"})
                                     }
                                     else if (data.obra_social_borrar == 'ok') {
-                                        res.json({resultado: true, mensaje: "Obra Social borrada", id: data.obra_social_borrar})
+                                        res.json({resultado: true, mensaje: "Obra Social borrada"})
                                     }
                                     else{
                                         console.log("Error en obra_social_borrar: " + data.obra_social_borrar);
