@@ -67,8 +67,8 @@ module.exports = function(db, pgp){
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
                     if (decoded.rol == "admin"){
-                        if (req.body.nombre){
-                            db.func("obra_social_borrar", req.body.nombre, qrm.one)
+                        if (req.params.id){
+                            db.func("obra_social_borrar", req.params.id, qrm.one)
                                 .then(function(data){
                                     if (data.obra_social_borrar == 'error-obra'){
                                         res.status(400).json({resultado: false, mensaje: "no existe una Obra Social con ese nombre"})
