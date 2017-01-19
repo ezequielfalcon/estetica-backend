@@ -25,7 +25,6 @@ app.post('/api/usuarios', usuarios.crear);
 app.delete('/api/usuarios/:id', usuarios.borrarUsuario);
 app.put('/api/usuarios/:id', usuarios.modificarUsuario);
 
-
 //roles
 app.get('/api/roles', roles.traer);
 app.get('/api/roles/:id', roles.traer);
@@ -39,6 +38,13 @@ app.get('/api/obras_sociales/:id', obras_sociales.traer);
 app.post('/api/obras_sociales', obras_sociales.crear);
 app.put('/api/obras_sociales/:id', obras_sociales.modificar);
 app.delete('/api/obras_sociales/:id', obras_sociales.borrar);
+
+//pacientes
+app.get('/api/pacientes');
+app.get('/api/pacientes/:id/:dni');
+app.post('/api/pacientes');
+app.put('/api/pacientes/:id');
+app.delete('/api/pacientes/:id');
 
 app.get('/api', function (req, res) {
     res.json({mensaje: "Backend del sistema!!"})
