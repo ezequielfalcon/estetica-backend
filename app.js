@@ -6,6 +6,7 @@ var db = pgp(process.env.DATABASE_URL);
 var seguridad = require('./server/seguridad.js')(db);
 var usuarios = require('./server/usuarios.js')(db, pgp);
 var obras_sociales = require('./server/obras_sociales')(db, pgp);
+var roles = require('./server/roles.js')(db, pgp);
 
 
 app.use( bodyParser.json() );
@@ -26,11 +27,11 @@ app.put('/api/usuarios/:id', usuarios.modificarUsuario);
 
 
 //roles
-app.get('/api/roles');
-app.get('/api/roles/:id');
-app.post('/api/roles');
-app.delete('/api/roles/:id');
-app.put('/api/roles/:id');
+app.get('/api/roles', roles.traer);
+app.get('/api/roles/:id', roles.traer);
+app.post('/api/roles', roles.crear);
+app.delete('/api/roles/:id', roles.borrar);
+app.put('/api/roles/:id', roles.modificar);
 
 //obras sociales
 app.get('/api/obras_sociales', obras_sociales.traer);
