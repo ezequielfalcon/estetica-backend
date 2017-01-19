@@ -10,7 +10,7 @@ module.exports = function (db, pgp) {
 
     module.usuarios = usuariosFunc;
     module.usuario = usuario;
-    module.nuevoUsuario = nuevoUsuario;
+    module.crear = crear;
     module.borrarUsuario = borrarUsuario;
     module.modificarUsuario = modificarUsuario;
 
@@ -143,7 +143,7 @@ module.exports = function (db, pgp) {
         }
     }
 
-    function nuevoUsuario (req, res){
+    function crear (req, res){
         var token = req.headers['x-access-token'];
         if (token){
             if(req.body.usuario && req.body.clave && req.body.rol){

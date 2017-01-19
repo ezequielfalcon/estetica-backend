@@ -5,6 +5,7 @@ var pgp = require("pg-promise")();
 var db = pgp(process.env.DATABASE_URL);
 var seguridad = require('./server/seguridad.js')(db);
 var usuarios = require('./server/usuarios.js')(db, pgp);
+var obras_sociales = require('./server/obras_sociales')(db, pgp);
 
 
 app.use( bodyParser.json() );
@@ -19,13 +20,17 @@ app.post('/api/login', seguridad.login);
 //usuarios
 app.get('/api/usuarios', usuarios.usuarios);
 app.get('/api/usuarios/:id', usuarios.usuario);
-app.post('/api/usuarios', usuarios.nuevoUsuario);
+app.post('/api/usuarios', usuarios.crear);
 app.delete('/api/usuarios/:id', usuarios.borrarUsuario);
 app.put('/api/usuarios/:id', usuarios.modificarUsuario);
 
 
 //obras sociales
-
+app.get('/api/obras_sociales');
+app.get('/api/obras_sociales/:id');
+app.post('/api/obras_sociales', obras_sociales.crear);
+app.put('/api/obras_sociales/:id');
+app.delete('/api/obras_sociales/:id', obras_sociales.borrar);
 
 app.get('/api', function (req, res) {
     res.json({mensaje: "Backend del sistema!!"})
