@@ -25,11 +25,18 @@ app.delete('/api/usuarios/:id', usuarios.borrarUsuario);
 app.put('/api/usuarios/:id', usuarios.modificarUsuario);
 
 
+//roles
+app.get('/api/roles');
+app.get('/api/roles/:id');
+app.post('/api/roles');
+app.delete('/api/roles/:id');
+app.put('/api/roles/:id');
+
 //obras sociales
 app.get('/api/obras_sociales', obras_sociales.traer);
 app.get('/api/obras_sociales/:id', obras_sociales.traer);
 app.post('/api/obras_sociales', obras_sociales.crear);
-app.put('/api/obras_sociales/:id');
+app.put('/api/obras_sociales/:id', obras_sociales.modificar);
 app.delete('/api/obras_sociales/:id', obras_sociales.borrar);
 
 app.get('/api', function (req, res) {

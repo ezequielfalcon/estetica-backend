@@ -10,6 +10,56 @@ module.exports = function(db, pgp){
     module.crear = crear;
     module.borrar = borrar;
     module.traer = traer;
+    module.modificar = modificar;
+
+    function modificar(req, res){
+        var token = req.headers['x-access-token'];
+        if (token){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
+                if (err){
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
+                }
+                else{
+                    console.log("Usuario " + decoded.nombre + " autorizado");
+                    if (decoded.rol == "admin"){
+                        if (req.params.id && req.body.nombre){
+                            db.func("obra_social_modificar", [req.params.id, req.body.nombre], qrm.one)
+                                .then(function(data){
+                                    if (data.obra_social_modificar == 'error-obra'){
+                                        res.status(404).json({resultado: false, mensaje: "no se encuentra la obra social"})
+                                    }
+                                    else if(data.obra_social_modificar == 'error-existe'){
+                                        res.status(400).json({resultado: false, mensaje: "ya existe una obra social con ese nombre"})
+                                    }
+                                    else if (data.obra_social_modificar == 'ok'){
+                                        res.json({resultado: true, mensaje: "Obra Social modificada"})
+                                    }
+                                    else{
+                                        console.log("Error en obra_social_modificar: " + data);
+                                        res.status(500).json({resultado: false, mensaje: "error interno"});
+                                    }
+                                })
+                        }
+                        else{
+                            console.log("Obra social POST sin todos los datos necesarios");
+                            res.status(400).json({resultado: false, mensaje: "Faltan datos en el POST"})
+                        }
+                    }
+                    else{
+                        console.log("Usuario " + decoded.nombre + " no autorizado");
+                        res.status(403).json({resultado: false, mensaje:"no tiene permiso para crear Obras Sociales!"});
+                    }
+                }
+            });
+        }
+        else{
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
 
     function traer(req,res){
         var token = req.headers['x-access-token'];
@@ -28,7 +78,7 @@ module.exports = function(db, pgp){
                                     res.json({resultado: true, datos: data})
                                 }
                                 else {
-                                    res.status(404).json({resultado: false, mensaje: "no se encuentra la obra docial",})
+                                    res.status(404).json({resultado: false, mensaje: "no se encuentra la obra docial"})
                                 }
                             })
                     }
