@@ -69,8 +69,8 @@ module.exports = function(db, pgp){
                                     if (data.obra_social_borrar == 'error-obra'){
                                         res.status(400).json({resultado: false, mensaje: "no existe una Obra Social con ese nombre"})
                                     }
-                                    else if(data.obra_social_borrar){
-
+                                    else if(data.obra_social_borrar == 'error-pacientes'){
+                                        res.status(400).json({resultado: false, mensaje: "La obra social está siendo usada por algún paciente"})
                                     }
                                     else if (data.obra_social_borrar == 'ok') {
                                         res.json({resultado: true, mensaje: "Obra Social borrada", id: data.obra_social_borrar})
