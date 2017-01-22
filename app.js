@@ -10,7 +10,7 @@ var roles = require('./server/roles.js')(db, pgp);
 
 
 app.use( bodyParser.json() );
-//app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set('port', (process.env.PORT || 5000));
 
 
