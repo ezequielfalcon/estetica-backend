@@ -51,6 +51,8 @@ module.exports= function(db) {
         }
         else{
             console.log("error en el POST para login" + req.body);
+            var pepe = JSON.parse(req);
+            console.log(pepe);
             res.status(400).json({resultado: false, mensaje: "faltan datos del post: usuario y clave"})
         }
 
