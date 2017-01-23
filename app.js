@@ -8,6 +8,11 @@ var usuarios = require('./server/usuarios.js')(db, pgp);
 var obras_sociales = require('./server/obras_sociales')(db, pgp);
 var roles = require('./server/roles.js')(db, pgp);
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
 app.use( bodyParser.json() );
 app.use(bodyParser.urlencoded({ extended: true }));
