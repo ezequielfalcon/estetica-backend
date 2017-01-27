@@ -47,7 +47,7 @@ app.delete('/api/obras_sociales/:id', obras_sociales.borrar);
 
 //pacientes
 app.get('/api/pacientes', pacientes.traer);
-app.get('/api/pacientes/:id/:dni');
+app.get('/api/pacientes/:id', pacientes.traer);
 app.post('/api/pacientes');
 app.put('/api/pacientes/:id');
 app.delete('/api/pacientes/:id');
