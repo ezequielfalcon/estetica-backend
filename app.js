@@ -7,6 +7,7 @@ var seguridad = require('./server/seguridad.js')(db);
 var usuarios = require('./server/usuarios.js')(db, pgp);
 var obras_sociales = require('./server/obras_sociales')(db, pgp);
 var roles = require('./server/roles.js')(db, pgp);
+var pacientes = require('./server/pacientes')(db, pgp);
 
 
 app.use( bodyParser.json() );
@@ -40,7 +41,7 @@ app.put('/api/obras_sociales/:id', obras_sociales.modificar);
 app.delete('/api/obras_sociales/:id', obras_sociales.borrar);
 
 //pacientes
-app.get('/api/pacientes');
+app.get('/api/pacientes', pacientes.traer);
 app.get('/api/pacientes/:id/:dni');
 app.post('/api/pacientes');
 app.put('/api/pacientes/:id');
