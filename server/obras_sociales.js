@@ -27,7 +27,8 @@ module.exports = function(db, pgp){
                             db.func("obra_social_modificar", [req.params.id, req.body.nombre], qrm.one)
                                 .then(function(data){
                                     if (data.obra_social_modificar == 'error-obra'){
-                                        res.status(404).json({resultado: false, mensaje: "no se encuentra la obra social"})
+                                        res.status(404).json({resultado: false, mensaje: "no se encuentra la obra social"});
+                                        console.log("error 404 en funcion ObraSocialModificar");
                                     }
                                     else if(data.obra_social_modificar == 'error-existe'){
                                         res.status(400).json({resultado: false, mensaje: "ya existe una obra social con ese nombre"})
