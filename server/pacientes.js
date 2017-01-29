@@ -8,7 +8,7 @@ module.exports = function(db, pgp){
     var qrm = pgp.queryResult;
 
     module.crear = crear;
-    //module.borrar = borrar;
+    module.borrar = borrar;
     module.traer = traer;
     module.modificar = modificar;
 
@@ -158,6 +158,56 @@ module.exports = function(db, pgp){
                     else{
                         console.log("Usuario " + decoded.nombre + " no autorizado");
                         res.status(403).json({resultado: false, mensaje:"no tiene permiso para modificar Pacientes!"});
+                    }
+                }
+            });
+        }
+        else{
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
+
+    function borrar(req, res){
+        var token = req.headers['x-access-token'];
+        if (token){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
+                if (err){
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
+                }
+                else{
+                    console.log("Usuario " + decoded.nombre + " autorizado");
+                    if (decoded.rol == "admin"){
+                        if (req.params.id){
+                            db.func("paciente_borrar", req.params.id, qrm.one)
+                                .then(function(data){
+                                    if (data.paciente_borrar == 'error-paciente'){
+                                        res.status(404).json({resultado: false, mensaje: "no se encuentra el paciente"})
+                                    }
+                                    else if (data.paciente_borrar == 'ok') {
+                                        res.json({resultado: true, mensaje: "Paciente borrado"})
+                                    }
+                                    else{
+                                        console.log("Error en paciente_borrar: " + data.paciente_borrar);
+                                        res.status(500).json({resultado: false, mensaje: "error no especificado:" + data.paciente_borrar})
+                                    }
+                                })
+                                .catch(function(err){
+                                    console.log(err);
+                                    res.status(500).json({resultado: false, mensaje: err})
+                                })
+                        }
+                        else{
+                            console.log("Paciente POST sin todos los datos necesarios");
+                            res.status(400).json({resultado: false, mensaje: "Faltan datos en el POST"})
+                        }
+                    }
+                    else{
+                        console.log("Usuario " + decoded.nombre + " no autorizado");
+                        res.status(403).json({resultado: false, mensaje:"no tiene permiso para borrar Pacientes!"});
                     }
                 }
             });

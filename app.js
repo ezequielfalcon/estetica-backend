@@ -51,7 +51,7 @@ app.get('/api/pacientes', pacientes.traer);
 app.get('/api/pacientes/:id', pacientes.traer);
 app.post('/api/pacientes', pacientes.crear);
 app.put('/api/pacientes/:id', pacientes.modificar);
-app.delete('/api/pacientes/:id');
+app.delete('/api/pacientes/:id', pacientes.borrar);
 
 app.get('/api', function (req, res) {
     res.json({mensaje: "Backend del sistema!!"})
