@@ -69,6 +69,7 @@ module.exports = function(db, pgp){
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
                     if (decoded.rol == "admin"){
+                        console.log(req.body);
                         if (req.body.nombre && req.body.apellido && req.body.documento
                             && req.body.fecha && req.body.telefono && req.body.mail
                             && req.body.sexo && req.body.id_os){
