@@ -33,7 +33,8 @@ module.exports= function(db) {
                             res.json({
                                 resultado: true,
                                 mensaje: "Sesión iniciada",
-                                token: token
+                                token: token,
+                                usuario: usuarioDb
                             })
                         }
                         else{
