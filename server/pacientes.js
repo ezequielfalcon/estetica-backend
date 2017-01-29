@@ -10,7 +10,7 @@ module.exports = function(db, pgp){
     module.crear = crear;
     //module.borrar = borrar;
     module.traer = traer;
-    //module.modificar = modificar;
+    module.modificar = modificar;
 
     function traer(req,res){
         var token = req.headers['x-access-token'];
@@ -99,6 +99,65 @@ module.exports = function(db, pgp){
                     else{
                         console.log("Usuario " + decoded.nombre + " no autorizado");
                         res.status(403).json({resultado: false, mensaje:"no tiene permiso para crear Pacientes!"});
+                    }
+                }
+            });
+        }
+        else{
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
+
+    function modificar(req, res){
+        var token = req.headers['x-access-token'];
+        if (token){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
+                if (err){
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
+                }
+                else{
+                    console.log("Usuario " + decoded.nombre + " autorizado");
+                    if (decoded.rol == "admin"){
+                        if (req.body.nombre && req.body.apellido && req.body.documento
+                            && req.body.fecha && req.body.telefono && req.body.mail
+                            && req.body.sexo && req.body.id_os && req.params.id){
+                            db.func("paciente_modificar", [req.params.id, req.body.nombre, req.body.apellido, req.body.documento,
+                                req.body.fecha, req.body.telefono, req.body.mail,
+                                req.body.sexo, req.body.id_os], qrm.one)
+                                .then(function(data){
+                                    if (data.paciente_modificar == 'error-paciente'){
+                                        res.status(404).json({resultado: false, mensaje: "No se encuentra el paciente"})
+                                    }
+                                    else if (data.paciente_modificar == 'error-dni'){
+                                        res.status(400).json({resultado: false, mensaje: "Ya existe un paciente con ese Documento!"})
+                                    }
+                                    else if(data.paciente_modificar == 'error-os'){
+                                        res.status(400).json({resultado: false, mensaje: "no se encuentra la obra social"})
+                                    }
+                                    else if(data.paciente_modificar == 'ok'){
+                                        res.json({resultado: true, mensaje: "Paciente modificado"})
+                                    }
+                                    else {
+                                        res.status(500).json({resultado: false, mensaje: "error interno! " + data.paciente_modificar})
+                                    }
+                                })
+                                .catch(function(err){
+                                    console.log(err);
+                                    res.status(500).json({resultado: false, mensaje: err})
+                                })
+                        }
+                        else{
+                            console.log("Paciente POST sin todos los datos necesarios");
+                            res.status(400).json({resultado: false, mensaje: "Faltan datos en el POST"})
+                        }
+                    }
+                    else{
+                        console.log("Usuario " + decoded.nombre + " no autorizado");
+                        res.status(403).json({resultado: false, mensaje:"no tiene permiso para modificar Pacientes!"});
                     }
                 }
             });
