@@ -1,5 +1,5 @@
 /**
- * Created by eze on 18/01/17.
+ * Created by falco on 30/1/2017.
  */
 var jwt = require('jsonwebtoken');
 
@@ -21,23 +21,21 @@ module.exports = function(db, pgp){
                     res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
-                    console.log("Usuario " + decoded.nombre + " autorizado");
                     if (decoded.rol == "admin"){
-                        if (req.params.id && req.body.nombre){
-                            db.func("obra_social_modificar", [req.params.id, req.body.nombre], qrm.one)
+                        if (req.params.id && req.body.nombre && req.body.apellido && req.body.mail){
+                            db.func("medico_modificar", [req.params.id, req.body.nombre, req.body.apellido, req.body.mail], qrm.one)
                                 .then(function(data){
-                                    if (data.obra_social_modificar == 'error-obra'){
-                                        res.status(404).json({resultado: false, mensaje: "No se encuentra la Obra Social"});
-                                        console.log("error 404 en funcion ObraSocialModificar");
+                                    if (data.medico_modificar == 'error-medico'){
+                                        res.status(404).json({resultado: false, mensaje: "No se encuentra el Médico"});
                                     }
-                                    else if(data.obra_social_modificar == 'error-existe'){
-                                        res.status(400).json({resultado: false, mensaje: "Ya existe una Obra Social con ese nombre"})
+                                    else if(data.medico_modificar == 'error-mail'){
+                                        res.status(400).json({resultado: false, mensaje: "Ya existe un Médico con ese email"})
                                     }
-                                    else if (data.obra_social_modificar == 'ok'){
-                                        res.json({resultado: true, mensaje: "Obra Social modificada"})
+                                    else if (data.medico_modificar == 'ok'){
+                                        res.json({resultado: true, mensaje: "Médico modificado"})
                                     }
                                     else{
-                                        console.log("Error en obra_social_modificar: " + data);
+                                        console.log("Error en medico_modificar: " + data);
                                         res.status(500).json({resultado: false, mensaje: "error interno"});
                                     }
                                 })
@@ -47,13 +45,13 @@ module.exports = function(db, pgp){
                                 })
                         }
                         else{
-                            console.log("Obra social POST sin todos los datos necesarios");
-                            res.status(400).json({resultado: false, mensaje: "Faltan datos en el POST"})
+                            console.log("Medico POST sin todos los datos necesarios");
+                            res.status(400).json({resultado: false, mensaje: "Faltan datos para la petición"})
                         }
                     }
                     else{
                         console.log("Usuario " + decoded.nombre + " no autorizado");
-                        res.status(403).json({resultado: false, mensaje:"no tiene permiso para crear Obras Sociales!"});
+                        res.status(403).json({resultado: false, mensaje:"no tiene permiso para modificar Médicos!"});
                     }
                 }
             });
@@ -75,15 +73,14 @@ module.exports = function(db, pgp){
                     res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
-                    console.log("Usuario " + decoded.nombre + " autorizado");
                     if (req.params.id){
-                        db.oneOrNone("SELECT * FROM obras_sociales WHERE id = $1;", req.params.id)
+                        db.oneOrNone("SELECT * FROM medicos WHERE id = $1;", req.params.id)
                             .then(function(data){
                                 if (data){
                                     res.json({resultado: true, datos: data})
                                 }
                                 else {
-                                    res.status(404).json({resultado: false, mensaje: "no se encuentra la obra docial"})
+                                    res.status(404).json({resultado: false, mensaje: "No se encuentra el Médico"})
                                 }
                             })
                             .catch(function(err){
@@ -92,7 +89,7 @@ module.exports = function(db, pgp){
                             })
                     }
                     else{
-                        db.manyOrNone("SELECT * FROM obras_sociales;")
+                        db.manyOrNone("SELECT * FROM medicos;")
                             .then(function (data){
                                 res.json({resultado: true, datos: data})
                             })
@@ -124,13 +121,13 @@ module.exports = function(db, pgp){
                     console.log("Usuario " + decoded.nombre + " autorizado");
                     if (decoded.rol == "admin"){
                         if (req.body.nombre){
-                            db.func("obra_social_crear", req.body.nombre, qrm.one)
+                            db.func("medico_crear", [req.body.nombre, req.body.apellido, req.body.email], qrm.one)
                                 .then(function(data){
-                                    if (data.obra_social_crear == 'error-obra'){
-                                        res.status(400).json({resultado: false, mensaje: "ya existe una Obra Social con ese nombre"})
+                                    if (data.medico_crear == 'error-mail'){
+                                        res.status(400).json({resultado: false, mensaje: "Ya existe un Médico con ese email"})
                                     }
                                     else {
-                                        res.json({resultado: true, mensaje: "Obra Social creada", id: data.obra_social_crear})
+                                        res.json({resultado: true, mensaje: "Médico creado", id: data.medico_crear})
                                     }
                                 })
                                 .catch(function(err){
@@ -139,13 +136,13 @@ module.exports = function(db, pgp){
                                 })
                         }
                         else{
-                            console.log("Obra social POST sin todos los datos necesarios");
-                            res.status(400).json({resultado: false, mensaje: "Faltan datos en el POST"})
+                            console.log("Medico sin todos los datos necesarios");
+                            res.status(400).json({resultado: false, mensaje: "Faltan datos para crear el Médico"})
                         }
                     }
                     else{
                         console.log("Usuario " + decoded.nombre + " no autorizado");
-                        res.status(403).json({resultado: false, mensaje:"no tiene permiso para crear Obras Sociales!"});
+                        res.status(403).json({resultado: false, mensaje:"No tiene permiso para crear Médicos!"});
                     }
                 }
             });
@@ -170,20 +167,17 @@ module.exports = function(db, pgp){
                     console.log("Usuario " + decoded.nombre + " autorizado");
                     if (decoded.rol == "admin"){
                         if (req.params.id){
-                            db.func("obra_social_borrar", req.params.id, qrm.one)
+                            db.func("medico_borrar", req.params.id, qrm.one)
                                 .then(function(data){
-                                    if (data.obra_social_borrar == 'error-obra'){
-                                        res.status(400).json({resultado: false, mensaje: "no existe una Obra Social con ese nombre"})
+                                    if (data.medico_borrar == 'error-medico'){
+                                        res.status(404).json({resultado: false, mensaje: "No se encuentra el Médico"})
                                     }
-                                    else if(data.obra_social_borrar == 'error-pacientes'){
-                                        res.status(400).json({resultado: false, mensaje: "La obra social está siendo usada por algún paciente"})
-                                    }
-                                    else if (data.obra_social_borrar == 'ok') {
-                                        res.json({resultado: true, mensaje: "Obra Social borrada"})
+                                    else if (data.medico_borrar == 'ok') {
+                                        res.json({resultado: true, mensaje: "Médico borrado"})
                                     }
                                     else{
-                                        console.log("Error en obra_social_borrar: " + data.obra_social_borrar);
-                                        res.status(500).json({resultado: false, mensaje: "error no especificado:" + data.obra_social_borrar})
+                                        console.log("Error en medico_borrar: " + data.medico_borrar);
+                                        res.status(500).json({resultado: false, mensaje: "Error no especificado:" + data.medico_borrar})
                                     }
                                 })
                                 .catch(function(err){
@@ -192,13 +186,13 @@ module.exports = function(db, pgp){
                                 })
                         }
                         else{
-                            console.log("Obra social POST sin todos los datos necesarios");
-                            res.status(400).json({resultado: false, mensaje: "Faltan datos en el POST"})
+                            console.log("Medico POST sin todos los datos necesarios");
+                            res.status(400).json({resultado: false, mensaje: "Faltan datos"})
                         }
                     }
                     else{
                         console.log("Usuario " + decoded.nombre + " no autorizado");
-                        res.status(403).json({resultado: false, mensaje:"no tiene permiso para borrar Obras Sociales!"});
+                        res.status(403).json({resultado: false, mensaje:"No tiene permiso para borrar Médicos!"});
                     }
                 }
             });

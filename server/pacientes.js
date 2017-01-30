@@ -23,7 +23,7 @@ module.exports = function(db, pgp){
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
                     if (req.params.id){
-                        db.oneOrNone("SELECT * FROM pacientes WHERE id = $1", req.params.id)
+                        db.oneOrNone("SELECT * FROM pacientes WHERE id = $1;", req.params.id)
                             .then(function(data){
                                 if (data){
                                     res.json({resultado: true, datos: data})
@@ -38,7 +38,7 @@ module.exports = function(db, pgp){
                             })
                     }
                     else{
-                        db.manyOrNone("SELECT * FROM pacientes")
+                        db.manyOrNone("SELECT * FROM pacientes;")
                             .then(function (data){
                                 res.json({resultado: true, datos: data})
                             })

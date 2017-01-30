@@ -3,11 +3,13 @@ var app = express();
 var bodyParser = require('body-parser');
 var pgp = require("pg-promise")();
 var db = pgp(process.env.DATABASE_URL);
+
 var seguridad = require('./server/seguridad.js')(db);
 var usuarios = require('./server/usuarios.js')(db, pgp);
 var obras_sociales = require('./server/obras_sociales')(db, pgp);
 var roles = require('./server/roles.js')(db, pgp);
 var pacientes = require('./server/pacientes')(db, pgp);
+var medicos = require('./server/medicos')(db, pgp);
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -52,6 +54,13 @@ app.get('/api/pacientes/:id', pacientes.traer);
 app.post('/api/pacientes', pacientes.crear);
 app.put('/api/pacientes/:id', pacientes.modificar);
 app.delete('/api/pacientes/:id', pacientes.borrar);
+
+//medicos
+app.get('/api/medicos', medicos.traer);
+app.get('/api/medicos/:id', medicos.traer);
+app.post('/api/medicos', medicos.crear);
+app.put('/api/medicos/:id', medicos.modificar);
+app.delete('/api/medicos/:id', medicos.borrar);
 
 app.get('/api', function (req, res) {
     res.json({mensaje: "Backend del sistema!!"})
