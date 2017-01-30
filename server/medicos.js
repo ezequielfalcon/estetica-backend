@@ -120,8 +120,8 @@ module.exports = function(db, pgp){
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
                     if (decoded.rol == "admin"){
-                        if (req.body.nombre){
-                            db.func("medico_crear", [req.body.nombre, req.body.apellido, req.body.email], qrm.one)
+                        if (req.body.nombre && req.body.apellido && req.body.mail){
+                            db.func("medico_crear", [req.body.nombre, req.body.apellido, req.body.mail], qrm.one)
                                 .then(function(data){
                                     if (data.medico_crear == 'error-mail'){
                                         res.status(400).json({resultado: false, mensaje: "Ya existe un Médico con ese email"})
