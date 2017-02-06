@@ -23,8 +23,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('port', (process.env.PORT || 5000));
 
 
-//login
+//seguridad
 app.post('/api/login', seguridad.login);
+app.post('/api/cambiar-clave');
 
 
 //usuarios
@@ -33,6 +34,7 @@ app.get('/api/usuarios/:id', usuarios.usuario);
 app.post('/api/usuarios', usuarios.crear);
 app.delete('/api/usuarios/:id', usuarios.borrarUsuario);
 app.put('/api/usuarios/:id', usuarios.modificarUsuario);
+app.post('/api/usuario/clave', usuarios.cambiarClave);
 
 //roles
 app.get('/api/roles', roles.traer);
