@@ -11,6 +11,7 @@ var roles = require('./server/roles.js')(db, pgp);
 var pacientes = require('./server/pacientes')(db, pgp);
 var medicos = require('./server/medicos')(db, pgp);
 var consultorios = require('./server/consultorios')(db, pgp);
+var turnos = require('./server/turnos')(db, pgp);
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -73,6 +74,9 @@ app.get('/api/consultorios/:id', consultorios.traer);
 app.post('/api/consultorios', consultorios.crear);
 app.put('/api/consultorios/:id', consultorios.modificar);
 app.delete('/api/consultorios/:id', consultorios.borrar);
+
+//turnos
+app.get('/api/configuracion-turnos', turnos.verConfiguracion);
 
 app.get('/api', function (req, res) {
     res.json({mensaje: "Backend del sistema!!"})
