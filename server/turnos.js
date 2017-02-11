@@ -9,7 +9,7 @@ module.exports = function(db, pgp){
 
     module.verConfiguracion = verConfiguracion;
 
-    function verConfigutacion(req,res){
+    function verConfiguracion(req,res){
         var token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
