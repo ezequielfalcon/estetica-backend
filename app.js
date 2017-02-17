@@ -22,8 +22,10 @@ app.use(function(req, res, next) {
 
 //asd
 
-app.use( bodyParser.json() );
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 app.set('port', (process.env.PORT || 5000));
 
 
@@ -79,8 +81,10 @@ app.delete('/api/consultorios/:id', consultorios.borrar);
 app.get('/api/configuracion-turnos', turnos.verConfiguracion);
 app.get('/api/turnos/:fecha', turnos.verTurnos);
 
-app.get('/api', function (req, res) {
-    res.json({mensaje: "Backend del sistema!!"})
+app.get('/api', function(req, res) {
+    res.json({
+        mensaje: "Backend del sistema!!"
+    })
 });
 
 app.listen(app.get('port'), function() {
