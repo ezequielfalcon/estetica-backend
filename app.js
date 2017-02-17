@@ -79,7 +79,7 @@ app.delete('/api/consultorios/:id', consultorios.borrar);
 
 //turnos
 app.get('/api/configuracion-turnos', turnos.verConfiguracion);
-app.get('/api/turnos/:fecha', turnos.verTurnos);
+app.get('/api/turnos', turnos.verTurnos);
 
 app.get('/api', function(req, res) {
     res.json({
