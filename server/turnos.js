@@ -23,7 +23,7 @@ module.exports = function(db, pgp) {
                 } else {
                     console.log("Usuario " + decoded.nombre + " autorizado");
                     console.log(req.params.fecha);
-                    db.many("SELECT * FROM agenda WHERE fecha = '$1';", req.params.fecha)
+                    db.many("SELECT * FROM agenda WHERE fecha = $1;", req.params.fecha)
                         .then(function(data) {
                             res.json({
                                 resultado: true,
