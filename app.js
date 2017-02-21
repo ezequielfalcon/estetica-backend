@@ -12,6 +12,7 @@ var pacientes = require('./server/pacientes')(db, pgp);
 var medicos = require('./server/medicos')(db, pgp);
 var consultorios = require('./server/consultorios')(db, pgp);
 var turnos = require('./server/turnos')(db, pgp);
+var tratamientos = require('./server/tratamientos')(db, pgp);
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -76,6 +77,13 @@ app.get('/api/consultorios/:id', consultorios.traer);
 app.post('/api/consultorios', consultorios.crear);
 app.put('/api/consultorios/:id', consultorios.modificar);
 app.delete('/api/consultorios/:id', consultorios.borrar);
+
+//tratamientos
+app.get('/api/tratamientos', tratamientos.traer);
+app.get('/api/tratamientos/:id', tratamientos.traer);
+app.post('/api/tratamientos', tratamientos.crear);
+app.put('/api/tratamientos/:id', tratamientos.modificar);
+app.delete('/api/tratamientos/:id', tratamientos.borrar);
 
 //turnos
 app.get('/api/configuracion-turnos', turnos.verConfiguracion);
