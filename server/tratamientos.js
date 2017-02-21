@@ -23,15 +23,15 @@ module.exports = function(db, pgp){
                 else{
                     if (decoded.rol == "admin"){
                         if (req.params.id && req.body.nombre && req.body.costo){
-                            db.func("tratamiento_modificar", [req.params.id, req.body.nombre, req.body.costo], qrm.one)
+                            db.func("tratamientos_modificar", [req.params.id, req.body.nombre, req.body.costo], qrm.one)
                                 .then(function(data){
-                                    if (data.tratamiento_modificar == 'error-tratamiento'){
+                                    if (data.tratamientos_modificar == 'error-tratamiento'){
                                         res.status(404).json({resultado: false, mensaje: "No se encuentra el Tratamiento"});
                                     }
-                                    else if(data.tratamiento_modificar == 'error-nombre'){
+                                    else if(data.tratamientos_modificar == 'error-nombre'){
                                         res.status(400).json({resultado: false, mensaje: "Ya existe un Tratamiento con ese nombre"})
                                     }
-                                    else if (data.tratamiento_modificar == 'ok'){
+                                    else if (data.tratamientos_modificar == 'ok'){
                                         res.json({resultado: true, mensaje: "Tratamiento modificado"})
                                     }
                                     else{
@@ -121,9 +121,9 @@ module.exports = function(db, pgp){
                     console.log("Usuario " + decoded.nombre + " autorizado");
                     if (decoded.rol == "admin"){
                         if (req.body.nombre && req.body.costo){
-                            db.func("tratamiento_crear", [req.body.nombre, req.body.costo], qrm.one)
+                            db.func("tratamientos_crear", [req.body.nombre, req.body.costo], qrm.one)
                                 .then(function(data){
-                                    if (data.tratamiento_crear == 'error-nombre'){
+                                    if (data.tratamientos_crear == 'error-nombre'){
                                         res.status(400).json({resultado: false, mensaje: "Ya existe un Tratamiento con ese nombre"})
                                     }
                                     else {
@@ -169,15 +169,15 @@ module.exports = function(db, pgp){
                         if (req.params.id){
                             db.func("tratamiento_borrar", req.params.id, qrm.one)
                                 .then(function(data){
-                                    if (data.tratamiento_borrar == 'error-tratamiento'){
+                                    if (data.tratamientos_borrar == 'error-tratamiento'){
                                         res.status(404).json({resultado: false, mensaje: "No se encuentra el Tratamiento"})
                                     }
-                                    else if (data.tratamiento_borrar == 'ok') {
+                                    else if (data.tratamientos_borrar == 'ok') {
                                         res.json({resultado: true, mensaje: "Tratamiento borrado"})
                                     }
                                     else{
-                                        console.log("Error en tratamiento_borrar: " + data.tratamiento_borrar);
-                                        res.status(500).json({resultado: false, mensaje: "Error no especificado:" + data.tratamiento_borrar})
+                                        console.log("Error en tratamiento_borrar: " + data.tratamientos_borrar);
+                                        res.status(500).json({resultado: false, mensaje: "Error no especificado:" + data.tratamientos_borrar})
                                     }
                                 })
                                 .catch(function(err){
