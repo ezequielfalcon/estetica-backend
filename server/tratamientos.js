@@ -167,7 +167,7 @@ module.exports = function(db, pgp){
                     console.log("Usuario " + decoded.nombre + " autorizado");
                     if (decoded.rol == "admin"){
                         if (req.params.id){
-                            db.func("tratamiento_borrar", req.params.id, qrm.one)
+                            db.func("tratamientos_borrar", req.params.id, qrm.one)
                                 .then(function(data){
                                     if (data.tratamientos_borrar == 'error-tratamiento'){
                                         res.status(404).json({resultado: false, mensaje: "No se encuentra el Tratamiento"})
