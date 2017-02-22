@@ -24,6 +24,7 @@ module.exports = function(db, pgp) {
                     if (req.body.id_turno && req.body.id_paciente && req.body.id_consultorio && req.body.id_medico
                         && req.body.id_tratamiento && req.body.observaciones
                         && req.body.costo && req.body.fecha && req.body.entreturno){
+                        console.log(req.body);
                         db.func("agenda_nuevo_turno", [req.body.id_turno, req.body.id_paciente
                            , req.body.id_consultorio, req.body.id_medico
                            , req.body.id_tratamiento, decoded.nombre, req.body.observaciones
@@ -51,7 +52,6 @@ module.exports = function(db, pgp) {
                                     res.json({resultado: true, mensaje: "Turno creado!"})
                                 }
                                 else{
-                                    console.log(req.body);
                                     res.status(500).json({resultado: false, mensaje: "Error interno: " + data.agenda_nuevo_turno});
                                 }
                             })
