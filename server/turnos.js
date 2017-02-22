@@ -51,6 +51,7 @@ module.exports = function(db, pgp) {
                                     res.json({resultado: true, mensaje: "Turno creado!"})
                                 }
                                 else{
+                                    console.log(req.body);
                                     res.status(500).json({resultado: false, mensaje: "Error interno: " + data.agenda_nuevo_turno});
                                 }
                             })
