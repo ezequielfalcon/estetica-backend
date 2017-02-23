@@ -49,7 +49,7 @@ module.exports = function(db, pgp) {
                                     res.status(400).json({resultado: false, mensaje: "Ya existe un turno en ese horario y consultorio!"})
                                 }
                                 else if (data.agenda_nuevo_turno == 'ok') {
-                                    res.json({resultado: true, mensaje: "Turno creado!"})
+                                    res.json({resultado: true, mensaje: "Turno creado!", id: data.agenda_nuevo_turno})
                                 }
                                 else{
                                     res.status(500).json({resultado: false, mensaje: "Error interno: " + data.agenda_nuevo_turno});
