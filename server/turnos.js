@@ -34,11 +34,8 @@ module.exports = function(db, pgp) {
                                 else if (data.agenda_turno_tratamiento == 'error-existe') {
                                     res.status(400).json({resultado: false, mensaje: "Error al asignar tratamiento: ya está asignado"})
                                 }
-                                else if (data.agenda_turno_tratamiento == 'ok') {
-                                    res.json({resultado: true, mensaje: "Tratamiento agregado correctamente!"})
-                                }
                                 else{
-                                    res.status(500).json({resultado: false, mensaje: "Error interno: " + data.agenda_turno_tratamiento});
+                                    res.json({resultado: true, mensaje: "Turno creado con ID: " + data.agenda_turno_tratamiento, id: data.agenda_turno_tratamiento});
                                 }
                             })
                             .catch(function(err){
