@@ -34,8 +34,11 @@ module.exports = function(db, pgp) {
                                 else if (data.agenda_turno_tratamiento == 'error-existe') {
                                     res.status(400).json({resultado: false, mensaje: "Error al asignar tratamiento: ya está asignado"})
                                 }
+                                else if (data.agenda_turno_tratamiento == 'ok') {
+                                    res.json({resultado: true, mensaje: "Tratamiento agregado correctamente!"})
+                                }
                                 else{
-                                    res.json({resultado: true, mensaje: "Turno creado con ID: " + data.agenda_turno_tratamiento, id: data.agenda_turno_tratamiento});
+                                    res.status(500).json({resultado: false, mensaje: "Error interno: " + data.agenda_turno_tratamiento});
                                 }
                             })
                             .catch(function(err){
@@ -91,11 +94,8 @@ module.exports = function(db, pgp) {
                                 else if (data.agenda_nuevo_turno == 'error-agenda') {
                                     res.status(400).json({resultado: false, mensaje: "Ya existe un turno en ese horario y consultorio!"})
                                 }
-                                else if (data.agenda_nuevo_turno == 'ok') {
-                                    res.json({resultado: true, mensaje: "Turno creado!", id: data.agenda_nuevo_turno})
-                                }
-                                else{
-                                    res.status(500).json({resultado: false, mensaje: "Error interno: " + data.agenda_nuevo_turno});
+                                else {
+                                    res.json({resultado: true, mensaje: "Turno creado con ID: " + data.agenda_nuevo_turno, id: data.agenda_nuevo_turno})
                                 }
                             })
                             .catch(function(err){
