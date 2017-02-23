@@ -89,6 +89,7 @@ app.delete('/api/tratamientos/:id', tratamientos.borrar);
 app.get('/api/configuracion-turnos', turnos.verConfiguracion);
 app.get('/api/turnos/:fecha', turnos.verTurnos);
 app.post('/api/nuevo-turno', turnos.crearTurno);
+app.post('/api/agregar-tratamiento', turnos.nuevoTratamientoTurno);
 
 app.get('/api', function(req, res) {
     res.json({
