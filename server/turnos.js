@@ -22,12 +22,12 @@ module.exports = function(db, pgp) {
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
                     if (req.body.id_turno && req.body.id_paciente && req.body.id_consultorio && req.body.id_medico
-                        && req.body.id_tratamiento && req.body.observaciones
+                        && req.body.observaciones
                         && req.body.costo && req.body.fecha && req.body.entreturno){
                         console.log(req.body);
                         db.func("agenda_nuevo_turno", [req.body.id_turno, req.body.id_paciente
                            , req.body.id_consultorio, req.body.id_medico
-                           , req.body.id_tratamiento, decoded.nombre, req.body.observaciones
+                           , decoded.nombre, req.body.observaciones
                            , req.body.costo, req.body.fecha, req.body.entreturno], qrm.one)
                             .then(function(data){
                                 if (data.agenda_nuevo_turno == 'error-turno'){
@@ -41,9 +41,6 @@ module.exports = function(db, pgp) {
                                 }
                                 else if (data.agenda_nuevo_turno == 'error-medico') {
                                     res.status(400).json({resultado: false, mensaje: "No se encuentra el médico"})
-                                }
-                                else if (data.agenda_nuevo_turno == 'error-tratamiento') {
-                                    res.status(400).json({resultado: false, mensaje: "No se encuentra el tratamiento"})
                                 }
                                 else if (data.agenda_nuevo_turno == 'error-agenda') {
                                     res.status(400).json({resultado: false, mensaje: "Ya existe un turno en ese horario y consultorio!"})
