@@ -129,22 +129,43 @@ module.exports = function(db, pgp) {
                         mensaje: "Error de autenticación"
                     });
                 } else {
-                    console.log("Usuario " + decoded.nombre + " autorizado");
-                    console.log(req.params.fecha);
-                    db.manyOrNone("SELECT * FROM agenda WHERE fecha = $1;", req.params.fecha)
-                        .then(function(data) {
-                            res.json({
-                                resultado: true,
-                                datos: data
-                            });
-                        })
-                        .catch(function(error) {
-                            console.log(error);
-                            res.status(500).json({
-                                resultado: false,
-                                mensaje: "Error interno al ver configuraciones: " + error
-                            });
-                        })
+                    if (req.params.fecha && req.params.consultorio && req.params.turno){
+                        db.oneOrNone("SELECT * FROM agenda WHERE fecha = $1 AND id_consultorio = $2 AND id_turno = $3;",
+                            [req.params.fecha, req.params.consultorio, req.params.turno])
+                            .then(function(data) {
+                                res.json({
+                                    resultado: true,
+                                    datos: data
+                                });
+                            })
+                            .catch(function(error) {
+                                console.log(error);
+                                res.status(500).json({
+                                    resultado: false,
+                                    mensaje: "Error interno al ver turno: " + error
+                                });
+                            })
+                    }
+                    else if(req.params.fecha){
+                        db.manyOrNone("SELECT * FROM agenda WHERE fecha = $1;", req.params.fecha)
+                            .then(function(data) {
+                                res.json({
+                                    resultado: true,
+                                    datos: data
+                                });
+                            })
+                            .catch(function(error) {
+                                console.log(error);
+                                res.status(500).json({
+                                    resultado: false,
+                                    mensaje: "Error interno al ver agenda: " + error
+                                });
+                            })
+                    }
+                    else {
+                        console.log("Agenda sin todos los datos necesarios");
+                        res.status(400).json({resultado: false, mensaje: "Faltan parámetros para ver los turnos"})
+                    }
                 }
             });
         } else {
