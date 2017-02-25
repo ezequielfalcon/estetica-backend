@@ -130,7 +130,7 @@ module.exports = function(db, pgp) {
                     });
                 } else {
                     if (req.params.fecha && req.params.consultorio && req.params.turno){
-                        db.oneOrNone("SELECT * FROM agenda WHERE fecha = $1 AND id_consultorio = $2 AND id_turno = $3;",
+                        db.one("SELECT * FROM agenda WHERE fecha = $1 AND id_consultorio = $2 AND id_turno = $3;",
                             [req.params.fecha, req.params.consultorio, req.params.turno])
                             .then(function(data) {
                                 res.json({
@@ -140,9 +140,9 @@ module.exports = function(db, pgp) {
                             })
                             .catch(function(error) {
                                 console.log(error);
-                                res.status(500).json({
+                                res.status(404).json({
                                     resultado: false,
-                                    mensaje: "Error interno al ver turno: " + error
+                                    mensaje: "No se encuentra el turno turno: " + error
                                 });
                             })
                     }
