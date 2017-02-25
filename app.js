@@ -81,6 +81,7 @@ app.delete('/api/consultorios/:id', consultorios.borrar);
 //tratamientos
 app.get('/api/tratamientos', tratamientos.traer);
 app.get('/api/tratamientos/:id', tratamientos.traer);
+app.get('/api/tratamientos-agenda/:id_agenda/');
 app.post('/api/tratamientos', tratamientos.crear);
 app.put('/api/tratamientos/:id', tratamientos.modificar);
 app.delete('/api/tratamientos/:id', tratamientos.borrar);

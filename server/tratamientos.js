@@ -11,6 +11,47 @@ module.exports = function(db, pgp){
     module.borrar = borrar;
     module.traer = traer;
     module.modificar = modificar;
+    module.traerAgenda = traerAgenda;
+
+    function traerAgenda(req, res){
+        var token = req.headers['x-access-token'];
+        if (token){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
+                if (err){
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
+                }
+                else{
+                    if (req.params.id_agenda){
+                        db.manyOrNone("SELECT id_tratamiento FROM tratamientos_por_turno WHERE id_agenda = $1;",
+                            req.params.id_agenda)
+                            .then(function(data){
+                                if (data){
+                                    res.json({resultado: true, datos: data})
+                                }
+                                else {
+                                    res.status(404).json({resultado: false, mensaje: "No se encuentra"})
+                                }
+                            })
+                            .catch(function(err){
+                                console.log(err);
+                                res.status(500).json({resultado: false, mensaje: err})
+                            })
+                    }
+                    else{
+                        console.log("Tratamiento GET sin todos los datos necesarios");
+                        res.status(400).json({resultado: false, mensaje: "Faltan datos para la petición"})
+                    }
+                }
+            });
+        }
+        else{
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
 
     function modificar(req, res){
         var token = req.headers['x-access-token'];
