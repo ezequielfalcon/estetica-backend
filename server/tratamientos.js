@@ -26,12 +26,7 @@ module.exports = function(db, pgp){
                         db.manyOrNone("SELECT id_tratamiento FROM tratamientos_por_turno WHERE id_agenda = $1;",
                             req.params.id_agenda)
                             .then(function(data){
-                                if (data){
-                                    res.json({resultado: true, datos: data})
-                                }
-                                else {
-                                    res.status(404).json({resultado: false, mensaje: "No se encuentra"})
-                                }
+                                res.json({resultado: true, datos: data})
                             })
                             .catch(function(err){
                                 console.log(err);
