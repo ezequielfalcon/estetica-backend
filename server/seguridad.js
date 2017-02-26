@@ -29,7 +29,7 @@ module.exports= function(db) {
                                 nombre: user,
                                 rol: data.rol
                             };
-                            var token = jwt.sign(usuarioDb, process.env.JWT_SECRET);
+                            var token = jwt.sign(usuarioDb, process.env.JWT_SECRET, {expiresIn: "24h"});
                             res.json({
                                 resultado: true,
                                 mensaje: "Sesión iniciada",
