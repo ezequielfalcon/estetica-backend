@@ -22,9 +22,9 @@ module.exports = function(db, pgp){
                     res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
-                    if (req.params.id_agenda){
+                    if (req.params.id){
                         db.manyOrNone("SELECT id_tratamiento FROM tratamientos_por_turno WHERE id_agenda = $1;",
-                            req.params.id_agenda)
+                            req.params.id)
                             .then(function(data){
                                 res.json({resultado: true, datos: data})
                             })
