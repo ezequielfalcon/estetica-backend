@@ -23,7 +23,7 @@ module.exports = function(db, pgp){
                 }
                 else{
                     if (req.params.id){
-                        db.manyOrNone("SELECT id_tratamiento FROM tratamientos_por_turno WHERE id_agenda = $1;",
+                        db.manyOrNone("SELECT tratamientos.id, tratamientos.nombre, tratamientos.costo FROM tratamientos INNER JOIN tratamientos_por_turno ON tratamientos.id = tratamientos_por_turno.id_tratamiento WHERE tratamientos_por_turno.id_agenda = $1;",
                             req.params.id)
                             .then(function(data){
                                 res.json({resultado: true, datos: data})
