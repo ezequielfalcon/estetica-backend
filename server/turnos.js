@@ -129,9 +129,9 @@ module.exports = function(db, pgp) {
                         mensaje: "Error de autenticación"
                     });
                 } else {
-                    if (req.params.fecha && req.params.consultorio && req.params.turno){
-                        db.oneOrNone("SELECT * FROM agenda WHERE fecha = $1 AND id_consultorio = $2 AND id_turno = $3;",
-                            [req.params.fecha, req.params.consultorio, req.params.turno])
+                    if (req.params.fecha && req.params.consultorio && req.params.turno && req.params.entreturno){
+                        db.oneOrNone("SELECT * FROM agenda WHERE fecha = $1 AND id_consultorio = $2 AND id_turno = $3 AND entreturno= $4;",
+                            [req.params.fecha, req.params.consultorio, req.params.turno, req.params.entreturno])
                             .then(function(data) {
                                 if(data){
                                     res.json({
