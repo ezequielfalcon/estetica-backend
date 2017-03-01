@@ -151,6 +151,22 @@ module.exports = function(db, pgp) {
                                 });
                             })
                     }
+                    else if (req.params.fecha && req.params.medico){
+                        db.manyOrNone("SELECT agenda.id, agenda.obvservaciones, agenda.costo, agenda.id_medico, agenda.id_paciente, agenda.id_consultorio, agenda.usuario, agenda.id_turno, agenda.fecha, agenda.entreturno FROM agenda INNER JOIN medicos on agenda.id_medico = medicos.id WHERE agenda.fecha = $1 AND agenda.id_medico = $2;", [req.params.fecha, req.params.medico])
+                            .then(function(data) {
+                                res.json({
+                                    resultado: true,
+                                    datos: data
+                                });
+                            })
+                            .catch(function(error) {
+                                console.log(error);
+                                res.status(500).json({
+                                    resultado: false,
+                                    mensaje: "Error interno al ver agenda: " + error
+                                });
+                            })
+                    }
                     else if(req.params.fecha){
                         db.manyOrNone("SELECT * FROM agenda WHERE fecha = $1;", req.params.fecha)
                             .then(function(data) {
