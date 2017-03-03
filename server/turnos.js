@@ -11,6 +11,7 @@ module.exports = function(db, pgp) {
     module.verTurnos = verTurnos;
     module.crearTurno = crearTurno;
     module.nuevoTratamientoTurno = nuevoTratamientoTurno;
+    module.agendaResumen = verAgendaResumen;
 
     function nuevoTratamientoTurno(req,res){
         var token = req.headers['x-access-token'];
@@ -180,6 +181,45 @@ module.exports = function(db, pgp) {
                                 res.status(500).json({
                                     resultado: false,
                                     mensaje: "Error interno al ver agenda: " + error
+                                });
+                            })
+                    }
+                    else {
+                        console.log("Agenda sin todos los datos necesarios");
+                        res.status(400).json({resultado: false, mensaje: "Faltan parámetros para ver los turnos"})
+                    }
+                }
+            });
+        } else {
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
+
+    function verAgendaResumen(req, res){
+        var token = req.headers['x-access-token'];
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+                if (err) {
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({
+                        resultado: false,
+                        mensaje: "Error de autenticación"
+                    });
+                } else {
+                    if (req.params.fecha){
+                        db.oneOrNone("SELECT agenda.id_consultorio consultorio, agenda.id_turno turno, agenda.usuario usuario, agenda.entreturno entreturno, medicos.color color, medicos.apellido apellido FROM agenda INNER JOIN medicos ON agenda.id_medico = medicos.id WHERE agenda.fecha = $1;",
+                            req.params.fecha)
+                            .then(function(data) {
+                                res.json({resultado: true, datos: data});
+                            })
+                            .catch(function(error) {
+                                console.log(error);
+                                res.status(500).json({
+                                    resultado: false,
+                                    mensaje: "Error interno: " + error
                                 });
                             })
                     }
