@@ -153,7 +153,7 @@ module.exports = function(db, pgp) {
                             })
                     }
                     else if (req.params.fecha && req.params.medico){
-                        db.manyOrNone("SELECT agenda.id, agenda.obvservaciones, agenda.costo, agenda.id_medico, agenda.id_paciente, agenda.id_consultorio, agenda.usuario, agenda.id_turno, agenda.fecha, agenda.entreturno FROM agenda INNER JOIN medicos on agenda.id_medico = medicos.id WHERE agenda.fecha = $1 AND agenda.id_medico = $2;", [req.params.fecha, req.params.medico])
+                        db.manyOrNone("SELECT agenda.id, CONCAT(pacientes.nombre, ' ', pacientes.apellido) paciente, agenda.id_consultorio, agenda.id_turno, agenda.entreturno FROM agenda INNER JOIN medicos on agenda.id_medico = medicos.id INNER JOIN pacientes ON agenda.id_paciente = pacientes.id WHERE agenda.fecha = $1 AND agenda.id_medico = $2;", [req.params.fecha, req.params.medico])
                             .then(function(data) {
                                 res.json({
                                     resultado: true,
