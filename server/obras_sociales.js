@@ -188,7 +188,12 @@ module.exports = function(db, pgp){
                                 })
                                 .catch(function(err){
                                     console.log(err);
-                                    res.status(500).json({resultado: false, mensaje: err})
+                                    if (err.code == '23503'){
+                                        res.status(400).json({resultado: false, mensaje: "La obra social tiene datos relacionados, no se puede borrar!"});
+                                    }
+                                    else{
+                                        res.status(500).json({resultado: false, mensaje: err});
+                                    }
                                 })
                         }
                         else{
