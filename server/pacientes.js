@@ -71,10 +71,12 @@ module.exports = function(db, pgp){
                     if (decoded.rol == "admin"){
                         if (req.body.nombre && req.body.apellido && req.body.documento
                             && req.body.fecha && req.body.telefono && req.body.mail
-                            && req.body.sexo && req.body.id_os){
+                            && req.body.sexo && req.body.id_os && req.body.numero_os
+                            && req.body.domicilio && req.body.obs){
                             db.func("paciente_crear", [req.body.nombre, req.body.apellido, req.body.documento,
                                 req.body.fecha, req.body.telefono, req.body.mail,
-                                req.body.sexo, req.body.id_os], qrm.one)
+                                req.body.sexo, req.body.id_os, req.body.numero_os,
+                                req.body.domicilio, req.body.obs], qrm.one)
                                 .then(function(data){
                                     if (data.paciente_crear == 'error-paciente'){
                                         res.status(400).json({resultado: false, mensaje: "ya existe una Paciente con ese DNI"})
@@ -124,10 +126,13 @@ module.exports = function(db, pgp){
                     if (decoded.rol == "admin"){
                         if (req.body.nombre && req.body.apellido && req.body.documento
                             && req.body.fecha && req.body.telefono && req.body.mail
-                            && req.body.sexo && req.body.id_os && req.params.id){
-                            db.func("paciente_modificar", [req.params.id, req.body.nombre, req.body.apellido, req.body.documento,
+                            && req.body.sexo && req.body.id_os && req.body.numero_os
+                            && req.body.domicilio && req.body.obs && req.params.id){
+                            db.func("paciente_modificar", [req.params.id, req.body.nombre,
+                                req.body.apellido, req.body.documento,
                                 req.body.fecha, req.body.telefono, req.body.mail,
-                                req.body.sexo, req.body.id_os], qrm.one)
+                                req.body.sexo, req.body.id_os, req.body.numero_os,
+                                req.body.domicilio, req.body.obs], qrm.one)
                                 .then(function(data){
                                     if (data.paciente_modificar == 'error-paciente'){
                                         res.status(404).json({resultado: false, mensaje: "No se encuentra el paciente"})
