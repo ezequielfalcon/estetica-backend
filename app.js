@@ -94,6 +94,7 @@ app.get('/api/turnos/:fecha', turnos.verTurnos);
 app.get('/api/agenda/:fecha', turnos.agendaResumen);
 app.post('/api/nuevo-turno', turnos.crearTurno);
 app.post('/api/agregar-tratamiento', turnos.nuevoTratamientoTurno);
+app.post('/api/turno-presente', turnos.agendaPresente);
 
 app.get('/api', function(req, res) {
     res.json({

@@ -12,6 +12,49 @@ module.exports = function(db, pgp) {
     module.crearTurno = crearTurno;
     module.nuevoTratamientoTurno = nuevoTratamientoTurno;
     module.agendaResumen = verAgendaResumen;
+    module.agendaPresente = agendaPresente;
+
+    function agendaPresente(req, res){
+        var token = req.headers['x-access-token'];
+        if (token){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
+                if (err){
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
+                }
+                else{
+                    if (req.body.id_agenda){
+                        db.func("agenda_presente", req.body.id_agenda, qrm.one)
+                            .then(function(data){
+                                if (data.agenda_presente == 'error-agenda'){
+                                    res.status(400).json({resultado: false, mensaje: "Error: No se encuentra el turno cargado"})
+                                }
+                                else if (data.agenda_presente == 'ok') {
+                                    res.json({resultado: true, mensaje: "Asistencia confirmada!"})
+                                }
+                                else{
+                                    res.status(500).json({resultado: false, mensaje: "Error interno: " + data.agenda_presente});
+                                }
+                            })
+                            .catch(function(err){
+                                console.log(err);
+                                res.status(500).json({resultado: false, mensaje: err})
+                            })
+                    }
+                    else{
+                        console.log("Agenda sin todos los datos necesarios");
+                        res.status(400).json({resultado: false, mensaje: "Faltan datos para configurar la presencia del paciente."})
+                    }
+                }
+            });
+        }
+        else{
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
 
     function nuevoTratamientoTurno(req,res){
         var token = req.headers['x-access-token'];
