@@ -22,8 +22,8 @@ module.exports = function(db, pgp){
                 }
                 else{
                     if (decoded.rol == "admin"){
-                        if (req.params.id && req.body.nombre && req.body.apellido && req.body.mail && req.body.color){
-                            db.func("medico_modificar", [req.params.id, req.body.nombre, req.body.apellido, req.body.mail, req.body.color], qrm.one)
+                        if (req.params.id && req.body.nombre && req.body.apellido && req.body.mail){
+                            db.func("medico_modificar", [req.params.id, req.body.nombre, req.body.apellido, req.body.mail], qrm.one)
                                 .then(function(data){
                                     if (data.medico_modificar == 'error-medico'){
                                         res.status(404).json({resultado: false, mensaje: "No se encuentra el Médico"});
@@ -120,8 +120,8 @@ module.exports = function(db, pgp){
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
                     if (decoded.rol == "admin"){
-                        if (req.body.nombre && req.body.apellido && req.body.mail && req.body.color){
-                            db.func("medico_crear", [req.body.nombre, req.body.apellido, req.body.mail, req.body.color], qrm.one)
+                        if (req.body.nombre && req.body.apellido && req.body.mail){
+                            db.func("medico_crear", [req.body.nombre, req.body.apellido, req.body.mail], qrm.one)
                                 .then(function(data){
                                     if (data.medico_crear == 'error-mail'){
                                         res.status(400).json({resultado: false, mensaje: "Ya existe un Médico con ese email"})
