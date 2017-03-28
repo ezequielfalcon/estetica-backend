@@ -23,8 +23,8 @@ module.exports = function(db, pgp) {
                     res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
-                    if (req.body.id_agenda){
-                        db.func("agenda_presente", req.body.id_agenda, qrm.one)
+                    if (req.body.id_agenda && req.body.presente){
+                        db.func("agenda_presente", [req.body.id_agenda, req.body.presente], qrm.one)
                             .then(function(data){
                                 if (data.agenda_presente == 'error-agenda'){
                                     res.status(400).json({resultado: false, mensaje: "Error: No se encuentra el turno cargado"})
