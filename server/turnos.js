@@ -196,7 +196,7 @@ module.exports = function(db, pgp) {
                             })
                     }
                     else if (req.params.fecha && req.params.medico){
-                        db.manyOrNone("SELECT agenda.id, CONCAT(pacientes.nombre, ' ', pacientes.apellido) paciente, agenda.id_consultorio, agenda.id_turno, agenda.entreturno FROM agenda INNER JOIN medicos on agenda.id_medico = medicos.id INNER JOIN pacientes ON agenda.id_paciente = pacientes.id WHERE agenda.fecha = $1 AND agenda.id_medico = $2;", [req.params.fecha, req.params.medico])
+                        db.manyOrNone("SELECT agenda.id, CONCAT(pacientes.nombre, ' ', pacientes.apellido) paciente, agenda.id_consultorio, agenda.id_turno, agenda.entreturno, agenda.presente, agenda.atendido, agenda.hora_llegada FROM agenda INNER JOIN medicos on agenda.id_medico = medicos.id INNER JOIN pacientes ON agenda.id_paciente = pacientes.id WHERE agenda.fecha = $1 AND agenda.id_medico = $2;", [req.params.fecha, req.params.medico])
                             .then(function(data) {
                                 res.json({
                                     resultado: true,
@@ -253,7 +253,7 @@ module.exports = function(db, pgp) {
                     });
                 } else {
                     if (req.params.fecha){
-                        db.manyOrNone("SELECT agenda.id_consultorio consultorio, agenda.id_turno turno, agenda.usuario usuario, agenda.entreturno entreturno, medicos.apellido apellido, agenda.presente presente FROM agenda INNER JOIN medicos ON agenda.id_medico = medicos.id WHERE agenda.fecha = $1;",
+                        db.manyOrNone("SELECT agenda.id_consultorio consultorio, agenda.id_turno turno, agenda.usuario usuario, agenda.entreturno entreturno, medicos.apellido apellido, agenda.presente presente, agenda.atendido atendido, agenda.hora_legada hora_llegada FROM agenda INNER JOIN medicos ON agenda.id_medico = medicos.id WHERE agenda.fecha = $1;",
                             req.params.fecha)
                             .then(function(data) {
                                 res.json({resultado: true, datos: data});
