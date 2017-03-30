@@ -253,7 +253,7 @@ module.exports = function(db, pgp) {
                     });
                 } else {
                     if (req.params.fecha){
-                        db.manyOrNone("SELECT agenda.id_consultorio consultorio, agenda.id_turno turno, agenda.usuario usuario, agenda.entreturno entreturno, medicos.apellido apellido, agenda.presente presente, agenda.atendido atendido, agenda.hora_legada hora_llegada FROM agenda INNER JOIN medicos ON agenda.id_medico = medicos.id WHERE agenda.fecha = $1;",
+                        db.manyOrNone("SELECT agenda.id_consultorio consultorio, agenda.id_turno turno, agenda.usuario usuario, agenda.entreturno entreturno, medicos.apellido apellido, agenda.presente presente, agenda.atendido atendido, agenda.hora_llegada hora_llegada FROM agenda INNER JOIN medicos ON agenda.id_medico = medicos.id WHERE agenda.fecha = $1;",
                             req.params.fecha)
                             .then(function(data) {
                                 res.json({resultado: true, datos: data});
