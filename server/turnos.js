@@ -29,6 +29,9 @@ module.exports = function(db, pgp) {
                                 if (data.agenda_presente == 'error-agenda'){
                                     res.status(400).json({resultado: false, mensaje: "Error: No se encuentra el turno cargado"})
                                 }
+                                else if (data.agenda_presente == 'error-atendido'){
+                                    res.status(400).json({resultado: false, mensaje: "Paciente ya atendido por el Médico!"});
+                                }
                                 else if (data.agenda_presente == 'ok') {
                                     res.json({resultado: true, mensaje: "Asistencia confirmada!"})
                                 }
