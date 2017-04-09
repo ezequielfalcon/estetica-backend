@@ -13,6 +13,7 @@ var medicos = require('./server/medicos')(db, pgp);
 var consultorios = require('./server/consultorios')(db, pgp);
 var turnos = require('./server/turnos')(db, pgp);
 var tratamientos = require('./server/tratamientos')(db, pgp);
+var ctacte = require('./server/cuenta_corriente')(db, pgp);
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -95,6 +96,9 @@ app.get('/api/agenda/:fecha', turnos.agendaResumen);
 app.post('/api/nuevo-turno', turnos.crearTurno);
 app.post('/api/agregar-tratamiento', turnos.nuevoTratamientoTurno);
 app.post('/api/turno-presente', turnos.agendaPresente);
+
+//cuenta corriente
+app.get('/api/cuenta-corriente/:id', ctacte.consultar);
 
 app.get('/api', function(req, res) {
     res.json({
