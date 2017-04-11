@@ -19,19 +19,24 @@ module.exports = function(db, pgp) {
                     res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
-                    if (req.params.id){
-                        db.manyOrNone("SELECT * FROM cuenta_corriente WHERE id_paciente = $1;", req.params.id)
-                            .then(function(data){
-                                res.json({resultado: true, datos: data})
-                            })
-                            .catch(function(err){
-                                console.log(err);
-                                res.status(500).json({resultado: false, mensaje: err})
-                            })
+                    if (decoded.rol == 'usuario' || decoded.rol == 'admin'){
+                        if (req.params.id){
+                            db.manyOrNone("SELECT * FROM cuenta_corriente WHERE id_paciente = $1;", req.params.id)
+                                .then(function(data){
+                                    res.json({resultado: true, datos: data})
+                                })
+                                .catch(function(err){
+                                    console.log(err);
+                                    res.status(500).json({resultado: false, mensaje: err})
+                                })
+                        }
+                        else{
+                            console.log("Consulta de cuenta corriente sin todos los datos necesarios");
+                            res.status(400).json({resultado: false, mensaje: "Faltan datos"})
+                        }
                     }
                     else{
-                        console.log("Consulta de cuenta corriente sin todos los datos necesarios");
-                        res.status(400).json({resultado: false, mensaje: "Faltan datos"})
+                        res.status(403).json({resultado: false, mensaje: 'Permiso denegado!'});
                     }
                 }
             });
@@ -53,19 +58,24 @@ module.exports = function(db, pgp) {
                     res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
-                    if (req.body.id_paciente && req.body.concepto && req.body.monto){
-                        db.manyOrNone("INSERT INTO cuenta_corriente (id_paciente, fecha, concepto, monto) VALUES ($1, CURRENT_DATE, $2, $3);", [req.body.id_paciente, req.body.concepto, req.body.monto])
-                            .then(function(){
-                                res.json({resultado: true})
-                            })
-                            .catch(function(err){
-                                console.log(err);
-                                res.status(500).json({resultado: false, mensaje: err})
-                            })
+                    if (decoded.rol == 'usuario' || decoded.rol == 'admin'){
+                        if (req.body.id_paciente && req.body.concepto && req.body.monto){
+                            db.manyOrNone("INSERT INTO cuenta_corriente (id_paciente, fecha, concepto, monto) VALUES ($1, CURRENT_DATE, $2, $3);", [req.body.id_paciente, req.body.concepto, req.body.monto])
+                                .then(function(){
+                                    res.json({resultado: true})
+                                })
+                                .catch(function(err){
+                                    console.log(err);
+                                    res.status(500).json({resultado: false, mensaje: err})
+                                })
+                        }
+                        else{
+                            console.log("Consulta de cuenta corriente sin todos los datos necesarios");
+                            res.status(400).json({resultado: false, mensaje: "Faltan datos"})
+                        }
                     }
                     else{
-                        console.log("Consulta de cuenta corriente sin todos los datos necesarios");
-                        res.status(400).json({resultado: false, mensaje: "Faltan datos"})
+                        res.status(403).json({resultado: false, mensaje: 'Permiso denegado!'});
                     }
                 }
             });
