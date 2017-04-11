@@ -99,6 +99,7 @@ app.post('/api/turno-presente', turnos.agendaPresente);
 
 //cuenta corriente
 app.get('/api/cuenta-corriente/:id', ctacte.consultar);
+app.post('/api/cuenta-corriente', ctacte.insertar);
 
 app.get('/api', function(req, res) {
     res.json({
