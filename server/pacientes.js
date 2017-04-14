@@ -21,7 +21,7 @@ module.exports = function(db, pgp){
                     res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
-                    if (decoded.rol == 'usuario' || decoded.rol == 'admin'){
+                    if (decoded.rol === 'usuario' || decoded.rol === 'admin'){
                         if (req.params.id){
                             db.oneOrNone("SELECT * FROM pacientes WHERE id = $1;", req.params.id)
                                 .then(function(data){
@@ -38,7 +38,7 @@ module.exports = function(db, pgp){
                                 })
                         }
                         else{
-                            db.manyOrNone("SELECT * FROM pacientes;")
+                            db.manyOrNone("SELECT * FROM pacientes LIMIT 100;")
                                 .then(function (data){
                                     res.json({resultado: true, datos: data})
                                 })
