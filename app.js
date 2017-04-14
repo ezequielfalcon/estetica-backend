@@ -64,6 +64,7 @@ app.get('/api/pacientes/:id', pacientes.traer);
 app.post('/api/pacientes', pacientes.crear);
 app.put('/api/pacientes/:id', pacientes.modificar);
 app.delete('/api/pacientes/:id', pacientes.borrar);
+app.post('/api/buscar-pacientes', pacientes.buscar);
 
 //medicos
 app.get('/api/medicos', medicos.traer);

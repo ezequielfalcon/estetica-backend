@@ -11,6 +11,45 @@ module.exports = function(db, pgp){
     module.borrar = borrar;
     module.traer = traer;
     module.modificar = modificar;
+    module.buscar = buscar;
+
+    function buscar(req,res){
+        var token = req.headers['x-access-token'];
+        if (token){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
+                if (err){
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
+                }
+                else{
+                    if (decoded.rol === 'usuario' || decoded.rol === 'admin' || decoded.rol === 'medico'){
+                        if (req.body.nombre || req.body.apellido || req.body.documento){
+                            db.manyOrNone("select * from pacientes where nombre ILIKE $1 AND apellido ILIKE $2 AND documento ILIKE $3 ORDER BY fecha_alta DESC LIMIT 50;", [req.body.nombre, req.body.apellido, req.body.documento])
+                                .then(function(data){
+                                    res.json({resultado: true, datos: data})
+                                })
+                                .catch(function(err){
+                                    console.log(err);
+                                    res.status(500).json({resultado: false, mensaje: err})
+                                })
+                        }
+                        else{
+                            res.status(400).json({resutado: false, mensaje: "Falta un parámetro de búsqueda!"});
+                        }
+                    }
+                    else{
+                        res.status(403).json({resultado: false, mensaje: 'Permiso denegado!'});
+                    }
+                }
+            });
+        }
+        else{
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
 
     function traer(req,res){
         var token = req.headers['x-access-token'];
@@ -21,7 +60,7 @@ module.exports = function(db, pgp){
                     res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
-                    if (decoded.rol === 'usuario' || decoded.rol === 'admin'){
+                    if (decoded.rol === 'usuario' || decoded.rol === 'admin' || decoded.rol === 'medico'){
                         if (req.params.id){
                             db.oneOrNone("SELECT * FROM pacientes WHERE id = $1;", req.params.id)
                                 .then(function(data){
@@ -38,7 +77,7 @@ module.exports = function(db, pgp){
                                 })
                         }
                         else{
-                            db.manyOrNone("SELECT * FROM pacientes LIMIT 100;")
+                            db.manyOrNone("select * from pacientes ORDER BY fecha_alta DESC LIMIT 100;")
                                 .then(function (data){
                                     res.json({resultado: true, datos: data})
                                 })
