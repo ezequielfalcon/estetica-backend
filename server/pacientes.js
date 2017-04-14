@@ -23,23 +23,18 @@ module.exports = function(db, pgp){
                 }
                 else{
                     if (decoded.rol === 'usuario' || decoded.rol === 'admin' || decoded.rol === 'medico'){
-                        if (req.body.nombre || req.body.apellido || req.body.documento){
-                            var nom = req.body.nombre + '%';
-                            var ape = req.body.apellido + '%';
-                            var dni = req.body.documento + '%';
-                            db.manyOrNone("select * from pacientes where nombre ILIKE $1 AND apellido ILIKE $2 AND documento ILIKE $3 ORDER BY fecha_alta DESC LIMIT 50;",
-                                [nom, ape, dni])
-                                .then(function(data){
-                                    res.json({resultado: true, datos: data})
-                                })
-                                .catch(function(err){
-                                    console.log(err);
-                                    res.status(500).json({resultado: false, mensaje: err})
-                                })
-                        }
-                        else{
-                            res.status(400).json({resutado: false, mensaje: "Falta un parámetro de búsqueda!"});
-                        }
+                        var nom = req.body.nombre + '%' || '%';
+                        var ape = req.body.apellido + '%' || '%';
+                        var dni = req.body.documento + '%' || '%';
+                        db.manyOrNone("select * from pacientes where nombre ILIKE $1 AND apellido ILIKE $2 AND documento ILIKE $3 ORDER BY fecha_alta DESC LIMIT 50;",
+                            [nom, ape, dni])
+                            .then(function(data){
+                                res.json({resultado: true, datos: data})
+                            })
+                            .catch(function(err){
+                                console.log(err);
+                                res.status(500).json({resultado: false, mensaje: err})
+                            })
                     }
                     else{
                         res.status(403).json({resultado: false, mensaje: 'Permiso denegado!'});
