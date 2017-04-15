@@ -14,6 +14,7 @@ var consultorios = require('./server/consultorios')(db, pgp);
 var turnos = require('./server/turnos')(db, pgp);
 var tratamientos = require('./server/tratamientos')(db, pgp);
 var ctacte = require('./server/cuenta_corriente')(db, pgp);
+var medicosSub = require('./server/medico-sub')(db, pgp);
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -101,6 +102,10 @@ app.post('/api/turno-presente', turnos.agendaPresente);
 //cuenta corriente
 app.get('/api/cuenta-corriente/:id', ctacte.consultar);
 app.post('/api/cuenta-corriente', ctacte.insertar);
+
+//subsistema medicos
+app.get('/api/sub-medicos/turnos/:fecha', medicosSub.turnos);
+app.put('/api/sub-medicos/turnos/:id', medicosSub.atendido);
 
 app.get('/api', function(req, res) {
     res.json({
