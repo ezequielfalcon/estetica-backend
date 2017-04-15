@@ -119,12 +119,18 @@ module.exports = function(db, pgp){
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    if (decoded.rol == "admin"){
-                        if (req.body.nombre && req.body.apellido && req.body.mail){
-                            db.func("medico_crear", [req.body.nombre, req.body.apellido, req.body.mail], qrm.one)
+                    if (decoded.rol === "admin"){
+                        if (req.body.nombre && req.body.apellido && req.body.mail && req.body.usuario && req.body.clave){
+                            db.func("medico_crear_v2", [req.body.nombre, req.body.apellido, req.body.mail, req.body.usuario, req.body.clave], qrm.one)
                                 .then(function(data){
-                                    if (data.medico_crear == 'error-mail'){
+                                    if (data.medico_crear_v2 === 'error-mail'){
                                         res.status(400).json({resultado: false, mensaje: "Ya existe un Médico con ese email"})
+                                    }
+                                    else if (data.medico_crear_v2 === 'error-usuario'){
+                                        res.status(400).json({resultado: false, mensaje: "Ya existe un Usuario con ese nombre"});
+                                    }
+                                    else if(data.medico_crear_v2 === 'error-rol'){
+                                        res.status(500).json({resultado: false, mensaje: "Error interno de asignación de usuario"});
                                     }
                                     else {
                                         res.json({resultado: true, mensaje: "Médico creado", id: data.medico_crear})
