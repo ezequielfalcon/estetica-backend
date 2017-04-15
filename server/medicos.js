@@ -2,6 +2,7 @@
  * Created by falco on 30/1/2017.
  */
 var jwt = require('jsonwebtoken');
+var bcrypt = require('bcrypt');
 
 module.exports = function(db, pgp){
     var module = {};
@@ -21,17 +22,17 @@ module.exports = function(db, pgp){
                     res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
-                    if (decoded.rol == "admin"){
+                    if (decoded.rol === "admin"){
                         if (req.params.id && req.body.nombre && req.body.apellido && req.body.mail){
                             db.func("medico_modificar", [req.params.id, req.body.nombre, req.body.apellido, req.body.mail], qrm.one)
                                 .then(function(data){
-                                    if (data.medico_modificar == 'error-medico'){
+                                    if (data.medico_modificar === 'error-medico'){
                                         res.status(404).json({resultado: false, mensaje: "No se encuentra el Médico"});
                                     }
-                                    else if(data.medico_modificar == 'error-mail'){
+                                    else if(data.medico_modificar === 'error-mail'){
                                         res.status(400).json({resultado: false, mensaje: "Ya existe un Médico con ese email"})
                                     }
-                                    else if (data.medico_modificar == 'ok'){
+                                    else if (data.medico_modificar === 'ok'){
                                         res.json({resultado: true, mensaje: "Médico modificado"})
                                     }
                                     else{
@@ -121,7 +122,8 @@ module.exports = function(db, pgp){
                     console.log("Usuario " + decoded.nombre + " autorizado");
                     if (decoded.rol === "admin"){
                         if (req.body.nombre && req.body.apellido && req.body.mail && req.body.usuario && req.body.clave){
-                            db.func("medico_crear_v2", [req.body.nombre, req.body.apellido, req.body.mail, req.body.usuario, req.body.clave], qrm.one)
+                            var hash = bcrypt.hashSync(req.body.clave, 10);
+                            db.func("medico_crear_v2", [req.body.nombre, req.body.apellido, req.body.mail, req.body.usuario, hash], qrm.one)
                                 .then(function(data){
                                     if (data.medico_crear_v2 === 'error-mail'){
                                         res.status(400).json({resultado: false, mensaje: "Ya existe un Médico con ese email"})
