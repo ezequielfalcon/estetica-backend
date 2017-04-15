@@ -135,7 +135,7 @@ module.exports = function(db, pgp){
                                         res.status(500).json({resultado: false, mensaje: "Error interno de asignación de usuario"});
                                     }
                                     else {
-                                        res.json({resultado: true, mensaje: "Médico creado", id: data.medico_crear})
+                                        res.json({resultado: true, mensaje: "Médico creado", id: data.medico_crear_v2})
                                     }
                                 })
                                 .catch(function(err){
