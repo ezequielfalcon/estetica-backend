@@ -94,7 +94,7 @@ app.get('/api/configuracion-turnos', turnos.verConfiguracion);
 app.get('/api/turnos/:fecha/:consultorio/:turno/:entreturno', turnos.verTurnos);
 app.get('/api/turnos/:fecha/:medico', turnos.verTurnos);
 app.get('/api/turnos/:fecha', turnos.verTurnos);
-app.get('/api/horarios', turnos.verHorarios());
+app.get('/api/horarios', turnos.verHorarios);
 app.delete('/api/turnos/:id', turnos.borrarTurno);
 app.get('/api/agenda/:fecha', turnos.agendaResumen);
 app.post('/api/nuevo-turno', turnos.crearTurno);
