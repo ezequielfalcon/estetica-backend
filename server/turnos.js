@@ -14,6 +14,40 @@ module.exports = function(db, pgp) {
     module.agendaResumen = verAgendaResumen;
     module.agendaPresente = agendaPresente;
     module.borrarTurno = borrarTurno;
+    module.verHorarios = verHorarios;
+
+    function verHorarios(req, res){
+        var token = req.headers['x-access-token'];
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+                if (err) {
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({
+                        resultado: false,
+                        mensaje: "Error de autenticación"
+                    });
+                } else {
+                    db.manyOrNone("select * from turnos order by id;",
+                        req.params.fecha)
+                        .then(function(data) {
+                            res.json({resultado: true, datos: data});
+                        })
+                        .catch(function(error) {
+                            console.log(error);
+                            res.status(500).json({
+                                resultado: false,
+                                mensaje: "Error interno: " + error
+                            });
+                        })
+                }
+            });
+        } else {
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
 
     function borrarTurno(req,res){
         var token = req.headers['x-access-token'];
