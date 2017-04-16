@@ -13,6 +13,57 @@ module.exports = function(db, pgp) {
     module.nuevoTratamientoTurno = nuevoTratamientoTurno;
     module.agendaResumen = verAgendaResumen;
     module.agendaPresente = agendaPresente;
+    module.borrarTurno = borrarTurno;
+
+    function borrarTurno(req,res){
+        var token = req.headers['x-access-token'];
+        if (token){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
+                if (err){
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
+                }
+                else{
+                    if (decoded.rol === 'admin' || decoded.rol === 'usuario'){
+                        if (req.params.id){
+                            db.func("agenda_borrar_turno", req.params.id, qrm.one)
+                                .then(function(data){
+                                    if (data.agenda_borrar_turno === 'error-agenda'){
+                                        res.status(400).json({resultado: false, mensaje: "No se encuentra el turno especificado"})
+                                    }
+                                    else if (data.agenda_borrar_turno === 'error-presente') {
+                                        res.status(400).json({resultado: false, mensaje: "No puede borrar un turno al que un paciente asistió!"})
+                                    }
+                                    else if (data.agenda_borrar_turno === 'ok') {
+                                        res.json({resultado: true, mensaje: "Turno borrado correctamente!"})
+                                    }
+                                    else{
+                                        res.status(500).json({resultado: false, mensaje: "Error interno: " + data.agenda_borrar_turno});
+                                    }
+                                })
+                                .catch(function(err){
+                                    console.log(err);
+                                    res.status(500).json({resultado: false, mensaje: err})
+                                })
+                        }
+                        else{
+                            console.log("Agenda sin todos los datos necesarios");
+                            res.status(400).json({resultado: false, mensaje: "Faltan datos para agregar el tratamiento al turno especificado"})
+                        }
+                    }
+                    else{
+                        res.status(403).json({resultado: false, mensaje: "No tiene permiso para borrar un Turno"});
+                    }
+                }
+            });
+        }
+        else{
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
 
     function agendaPresente(req, res){
         var token = req.headers['x-access-token'];
