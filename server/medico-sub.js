@@ -80,7 +80,7 @@ module.exports = function(db, pgp) {
                                 .then(function(data){
                                     res.json({resultado: true, datos: data})
                                 })
-                                .catch(function(error){
+                                .catch(function(err){
                                     console.log(err);
                                     res.status(500).json({resultado: false, mensaje: err})
                                 })
