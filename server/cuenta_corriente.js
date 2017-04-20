@@ -19,7 +19,7 @@ module.exports = function(db, pgp) {
                     res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
-                    if (decoded.rol == 'usuario' || decoded.rol == 'admin'){
+                    if (decoded.rol === 'usuario' || decoded.rol === 'admin'){
                         if (req.params.id){
                             db.manyOrNone("SELECT * FROM cuenta_corriente WHERE id_paciente = $1;", req.params.id)
                                 .then(function(data){
@@ -31,8 +31,14 @@ module.exports = function(db, pgp) {
                                 })
                         }
                         else{
-                            console.log("Consulta de cuenta corriente sin todos los datos necesarios");
-                            res.status(400).json({resultado: false, mensaje: "Faltan datos"})
+                            db.manyOrNone("select pacientes.id id, concat(pacientes.nombre, ' ', pacientes.apellido) paciente, sum(cuenta_corriente.monto) monto FROM cuenta_corriente INNER JOIN pacientes ON cuenta_corriente.id_paciente = pacientes.id WHERE monto != 0 GROUP BY pacientes.id ORDER BY monto DESC LIMIT 100;")
+                                .then(function(data){
+                                    res.json({resultaro: true, datos: data})
+                                })
+                                .catch(function(err){
+                                    console.log(err);
+                                    res.status(500).json({resultado: false, mensaje: err})
+                                })
                         }
                     }
                     else{
