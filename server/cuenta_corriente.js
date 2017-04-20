@@ -31,7 +31,7 @@ module.exports = function(db, pgp) {
                                 })
                         }
                         else{
-                            db.manyOrNone("select pacientes.id id, concat(pacientes.nombre, ' ', pacientes.apellido) paciente, sum(cuenta_corriente.monto) monto FROM cuenta_corriente INNER JOIN pacientes ON cuenta_corriente.id_paciente = pacientes.id WHERE monto != 0 GROUP BY pacientes.id ORDER BY monto DESC LIMIT 100;")
+                            db.manyOrNone("select pacientes.id id, concat(pacientes.nombre, ' ', pacientes.apellido) paciente, max(cuenta_corriente.fecha) ultimo_movimiento, sum(cuenta_corriente.monto) monto FROM cuenta_corriente INNER JOIN pacientes ON cuenta_corriente.id_paciente = pacientes.id WHERE monto != 0 GROUP BY pacientes.id ORDER BY monto DESC LIMIT 100;")
                                 .then(function(data){
                                     res.json({resultaro: true, datos: data})
                                 })
