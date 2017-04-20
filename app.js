@@ -104,6 +104,7 @@ app.post('/api/turno-presente', turnos.agendaPresente);
 //cuenta corriente
 app.get('/api/cuenta-corriente/:id', ctacte.consultar);
 app.post('/api/cuenta-corriente', ctacte.insertar);
+app.get('/api/cuenta-corriente', ctacte.consultar);
 
 //subsistema medicos
 app.get('/api/sub-medicos/turnos/:fecha', medicosSub.turnos);
