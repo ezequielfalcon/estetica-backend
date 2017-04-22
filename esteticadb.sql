@@ -203,6 +203,19 @@ alter table usuario_medico
 		foreign key (usuario) references usuarios
 ;
 
+CREATE TABLE public.anulaciones
+(
+    id SERIAL PRIMARY KEY,
+    id_medico INT NOT NULL,
+    fecha DATE NOT NULL,
+    id_horario_desde INT NOT NULL,
+    id_horario_hasta INT NOT NULL,
+    observaciones TEXT,
+    CONSTRAINT anulaciones_medicos_id_fk FOREIGN KEY (id_medico) REFERENCES medicos (id),
+    CONSTRAINT anulaciones_turnos_id_fk_desde FOREIGN KEY (id_horario_desde) REFERENCES turnos (id),
+    CONSTRAINT anulaciones_turnos__fk_hasta FOREIGN KEY (id_horario_hasta) REFERENCES turnos (id)
+);
+
 create function agenda_atendido(id_agenda_in integer) returns character varying
 	language plpgsql
 as $$
