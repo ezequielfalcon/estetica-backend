@@ -530,6 +530,39 @@ DECLARE
 $$
 ;
 
+create function medicos_crear_anulacion(id_medico_in INTEGER, fecha_in DATE, id_hr_desde_in INTEGER, id_hr_hasta_in INTEGER, observaciones_in TEXT)
+  returns CHARACTER VARYING LANGUAGE plpgsql AS $$
+  DECLARE
+    medicoExiste INTEGER;
+    horarioExiste1 INTEGER;
+    horarioExiste2 INTEGER;
+    anulacionExiste INTEGER;
+  BEGIN
+    SELECT id INTO medicoExiste FROM medicos WHERE id = id_medico_in;
+    IF medicoExiste IS NULL THEN
+      RETURN 'error-medico';
+    END IF;
+    SELECT id INTO horarioExiste1 FROM turnos WHERE id = id_hr_desde_in;
+    IF horarioExiste1 IS NULL THEN
+      RETURN 'error-desde';
+    END IF;
+    IF id_hr_desde_in > id_hr_hasta_in THEN
+      RETURN 'error-rango';
+    END IF;
+    SELECT id INTO horarioExiste2 FROM turnos WHERE id = id_hr_hasta_in;
+    IF horarioExiste2 IS NULL THEN
+      RETURN 'error-hasta';
+    END IF;
+    SELECT id INTO anulacionExiste FROM anulaciones WHERE fecha = fecha_in;
+    IF anulacionExiste IS NOT NULL THEN
+      RETURN 'error-anulacion';
+    END IF;
+    INSERT INTO anulaciones (id_medico, fecha, id_horario_desde, id_horario_hasta, observaciones)
+      VALUES (medicoExiste, fecha_in, horarioExiste1, horarioExiste2, observaciones_in);
+    RETURN 'ok';
+  END;
+  $$
+
 create function obra_social_borrar(id_in integer) returns character varying
 	language plpgsql
 as $$
