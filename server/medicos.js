@@ -25,7 +25,7 @@ module.exports = function(db, pgp){
                 }
                 else{
                     if (req.params.fecha){
-                        db.oneOrNone("select * from anulaciones where fecha = $1;", req.params.fecha)
+                        db.oneOrNone("select anulaciones.id, concat(medicos.nombre, ' ', medicos.apellido) medico, anulaciones.id_horario_desde, anulaciones.id_horario_hasta, anulaciones.observaciones  from anulaciones inner join medicos on anulaciones.id_medico = medicos.id where fecha = $1;", req.params.fecha)
                             .then(function(data){
                                 res.json({resultado: true, datos: data})
                             })
