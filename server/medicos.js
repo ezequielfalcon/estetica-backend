@@ -14,6 +14,46 @@ module.exports = function(db, pgp){
     module.modificar = modificar;
     module.nuevaAnulacion = nuevaAnulacion;
     module.verAnulaciones = verAnulaciones;
+    module.borrarAnulacion = borrarAnulacion;
+
+    function borrarAnulacion(req, res){
+        var token = req.headers['x-access-token'];
+        if (token){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
+                if (err){
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
+                }
+                else{
+                    if (decoded.rol === "admin"){
+                        if (req.params.id){
+                            db.none('DELETE FROM anulaciones WHERE id = $1', req.params.id)
+                                .then(function () {
+                                    res.json({resultado: true})
+                                })
+                                .catch(function (err) {
+                                    res.status(500).json({resutado: false, mensaje: err})
+                                })
+                        }
+                        else{
+                            console.log("Borrar Anulacion sin todos los datos necesarios");
+                            res.status(400).json({resultado: false, mensaje: "Faltan datos"})
+                        }
+                    }
+                    else{
+                        console.log("Usuario " + decoded.nombre + " no autorizado");
+                        res.status(403).json({resultado: false, mensaje:"No tiene permiso para borrar anulaciones!"});
+                    }
+                }
+            });
+        }
+        else{
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
 
     function verAnulaciones(req, res){
         var token = req.headers['x-access-token'];
@@ -25,7 +65,7 @@ module.exports = function(db, pgp){
                 }
                 else{
                     if (req.params.fecha){
-                        db.manyOrNone("select anulaciones.id, concat(medicos.nombre, ' ', medicos.apellido) medico, anulaciones.id_horario_desde, anulaciones.id_horario_hasta, anulaciones.observaciones  from anulaciones inner join medicos on anulaciones.id_medico = medicos.id where fecha = $1;", req.params.fecha)
+                        db.manyOrNone("select anulaciones.id, concat(medicos.nombre, ' ', medicos.apellido) medico, anulaciones.fecha, anulaciones.id_horario_desde, anulaciones.id_horario_hasta, anulaciones.observaciones  from anulaciones inner join medicos on anulaciones.id_medico = medicos.id where fecha = $1;", req.params.fecha)
                             .then(function(data){
                                 res.json({resultado: true, datos: data})
                             })
@@ -35,8 +75,14 @@ module.exports = function(db, pgp){
                             })
                     }
                     else{
-                        console.log("Anuacion sin todos los datos necesarios");
-                        res.status(400).json({resultado: false, mensaje: "Debe especificar una fecha!"})
+                        db.manyOrNone("select anulaciones.id, concat(medicos.nombre, ' ', medicos.apellido) medico, anulaciones.fecha, anulaciones.id_horario_desde, anulaciones.id_horario_hasta, anulaciones.observaciones  from anulaciones inner join medicos on anulaciones.id_medico = medicos.id;")
+                            .then(function(data){
+                                res.json({resultado: true, datos: data})
+                            })
+                            .catch(function(err){
+                                console.log(err);
+                                res.status(500).json({resultado: false, mensaje: err})
+                            })
                     }
                 }
             });
