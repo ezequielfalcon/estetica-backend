@@ -75,7 +75,7 @@ module.exports = function(db, pgp){
                             })
                     }
                     else{
-                        db.manyOrNone("select anulaciones.id, concat(medicos.nombre, ' ', medicos.apellido) medico, anulaciones.fecha, anulaciones.id_horario_desde, anulaciones.id_horario_hasta, anulaciones.observaciones  from anulaciones inner join medicos on anulaciones.id_medico = medicos.id;")
+                        db.manyOrNone("select anulaciones.id, concat(medicos.nombre, ' ', medicos.apellido) medico, anulaciones.fecha, anulaciones.id_horario_desde, anulaciones.id_horario_hasta, anulaciones.observaciones  from anulaciones inner join medicos on anulaciones.id_medico = medicos.id WHERE fecha >= current_date;")
                             .then(function(data){
                                 res.json({resultado: true, datos: data})
                             })
