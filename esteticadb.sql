@@ -538,6 +538,9 @@ create function medicos_crear_anulacion(id_medico_in INTEGER, fecha_in DATE, id_
     horarioExiste2 INTEGER;
     anulacionExiste INTEGER;
   BEGIN
+    IF fecha_in < current_date THEN
+      RETURN 'error-fecha';
+    END IF;
     SELECT id INTO medicoExiste FROM medicos WHERE id = id_medico_in;
     IF medicoExiste IS NULL THEN
       RETURN 'error-medico';
@@ -561,7 +564,7 @@ create function medicos_crear_anulacion(id_medico_in INTEGER, fecha_in DATE, id_
       VALUES (medicoExiste, fecha_in, horarioExiste1, horarioExiste2, observaciones_in);
     RETURN 'ok';
   END;
-  $$
+  $$;
 
 create function obra_social_borrar(id_in integer) returns character varying
 	language plpgsql
