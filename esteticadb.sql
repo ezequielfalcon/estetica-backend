@@ -255,15 +255,17 @@ $$
 ;
 
 create function agenda_nuevo_turno(id_turno_in integer, id_paciente_in integer, id_consultorio_in integer, id_medico_in integer, usuario_in character varying, obvs_in text, costo_in numeric, fecha_in date, entreturno_in boolean) returns character varying
-	language plpgsql
-as $$
-DECLARE
+LANGUAGE plpgsql
+AS $$
+  DECLARE
     turnoExiste INTEGER;
     pacienteExiste INTEGER;
     consultorioExiste INTEGER;
     medicoExiste INTEGER;
     agendaTurnoExiste INTEGER;
     nuevoTurnoAgenda INTEGER;
+    medicoDisponibleHora1 INTEGER;
+    medicoDisponibleHora2 INTEGER;
   BEGIN
     SELECT id INTO turnoExiste FROM turnos WHERE id = id_turno_in;
     IF turnoExiste IS NULL THEN
@@ -281,6 +283,13 @@ DECLARE
     IF medicoExiste IS NULL THEN
       RETURN 'error-medico';
     END IF;
+    SELECT id_horario_desde INTO medicoDisponibleHora1 FROM anulaciones WHERE id_medico = medicoExiste AND fecha = fecha_in;
+    IF medicoDisponibleHora1 IS NOT NULL THEN
+      SELECT id_horario_hasta INTO medicoDisponibleHora2 FROM anulaciones WHERE id_medico = medicoExiste AND fecha = fecha_in;
+      IF turnoExiste >= medicoDisponibleHora1 AND turnoExiste <= medicoDisponibleHora2 THEN
+        RETURN 'error-anulacion';
+      END IF;
+    END IF;
     SELECT id INTO agendaTurnoExiste FROM agenda WHERE id_turno = id_turno_in AND id_consultorio = id_consultorio_in
     AND fecha = fecha_in AND agenda.entreturno = entreturno_in;
     IF agendaTurnoExiste IS NOT NULL THEN
@@ -292,8 +301,8 @@ DECLARE
             turnoExiste, fecha_in, entreturno_in, FALSE, FALSE) RETURNING id INTO nuevoTurnoAgenda;
     RETURN CAST(nuevoTurnoAgenda AS CHARACTER VARYING);
   END;
-$$
-;
+
+$$;
 
 create function agenda_presente(id_agenda_in integer, presente_in boolean) returns character varying
 	language plpgsql
