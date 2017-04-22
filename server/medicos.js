@@ -13,6 +13,41 @@ module.exports = function(db, pgp){
     module.traer = traer;
     module.modificar = modificar;
     module.nuevaAnulacion = nuevaAnulacion;
+    module.verAnulaciones = verAnulaciones;
+
+    function verAnulaciones(req, res){
+        var token = req.headers['x-access-token'];
+        if (token){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
+                if (err){
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
+                }
+                else{
+                    if (req.params.fecha){
+                        db.oneOrNone("select * from anulaciones where fecha = $1;", req.params.fecha)
+                            .then(function(data){
+                                res.json({resultado: true, datos: data})
+                            })
+                            .catch(function(err){
+                                console.log(err);
+                                res.status(500).json({resultado: false, mensaje: err})
+                            })
+                    }
+                    else{
+                        console.log("Anuacion sin todos los datos necesarios");
+                        res.status(400).json({resultado: false, mensaje: "Debe especificar una fecha!"})
+                    }
+                }
+            });
+        }
+        else{
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
 
     function nuevaAnulacion(req, res){
         var token = req.headers['x-access-token'];
