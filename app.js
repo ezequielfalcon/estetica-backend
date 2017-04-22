@@ -74,6 +74,10 @@ app.post('/api/medicos', medicos.crear);
 app.put('/api/medicos/:id', medicos.modificar);
 app.delete('/api/medicos/:id', medicos.borrar);
 
+//anulaciones
+app.post('/api/anulaciones', medicos.nuevaAnulacion);
+app.get('/api/anulaciones/:fecha', medicos.verAnulaciones);
+
 //consultorios
 app.get('/api/consultorios', consultorios.traer);
 app.get('/api/consultorios/:id', consultorios.traer);
