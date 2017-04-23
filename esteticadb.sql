@@ -203,6 +203,19 @@ alter table usuario_medico
 		foreign key (usuario) references usuarios
 ;
 
+CREATE TABLE public.anulaciones
+(
+    id SERIAL PRIMARY KEY,
+    id_medico INT NOT NULL,
+    fecha DATE NOT NULL,
+    id_horario_desde INT NOT NULL,
+    id_horario_hasta INT NOT NULL,
+    observaciones TEXT,
+    CONSTRAINT anulaciones_medicos_id_fk FOREIGN KEY (id_medico) REFERENCES medicos (id),
+    CONSTRAINT anulaciones_turnos_id_fk_desde FOREIGN KEY (id_horario_desde) REFERENCES turnos (id),
+    CONSTRAINT anulaciones_turnos__fk_hasta FOREIGN KEY (id_horario_hasta) REFERENCES turnos (id)
+);
+
 create function agenda_atendido(id_agenda_in integer) returns character varying
 	language plpgsql
 as $$
@@ -242,15 +255,17 @@ $$
 ;
 
 create function agenda_nuevo_turno(id_turno_in integer, id_paciente_in integer, id_consultorio_in integer, id_medico_in integer, usuario_in character varying, obvs_in text, costo_in numeric, fecha_in date, entreturno_in boolean) returns character varying
-	language plpgsql
-as $$
-DECLARE
+LANGUAGE plpgsql
+AS $$
+  DECLARE
     turnoExiste INTEGER;
     pacienteExiste INTEGER;
     consultorioExiste INTEGER;
     medicoExiste INTEGER;
     agendaTurnoExiste INTEGER;
     nuevoTurnoAgenda INTEGER;
+    medicoDisponibleHora1 INTEGER;
+    medicoDisponibleHora2 INTEGER;
   BEGIN
     SELECT id INTO turnoExiste FROM turnos WHERE id = id_turno_in;
     IF turnoExiste IS NULL THEN
@@ -268,6 +283,13 @@ DECLARE
     IF medicoExiste IS NULL THEN
       RETURN 'error-medico';
     END IF;
+    SELECT id_horario_desde INTO medicoDisponibleHora1 FROM anulaciones WHERE id_medico = medicoExiste AND fecha = fecha_in;
+    IF medicoDisponibleHora1 IS NOT NULL THEN
+      SELECT id_horario_hasta INTO medicoDisponibleHora2 FROM anulaciones WHERE id_medico = medicoExiste AND fecha = fecha_in;
+      IF turnoExiste >= medicoDisponibleHora1 AND turnoExiste <= medicoDisponibleHora2 THEN
+        RETURN 'error-anulacion';
+      END IF;
+    END IF;
     SELECT id INTO agendaTurnoExiste FROM agenda WHERE id_turno = id_turno_in AND id_consultorio = id_consultorio_in
     AND fecha = fecha_in AND agenda.entreturno = entreturno_in;
     IF agendaTurnoExiste IS NOT NULL THEN
@@ -279,8 +301,8 @@ DECLARE
             turnoExiste, fecha_in, entreturno_in, FALSE, FALSE) RETURNING id INTO nuevoTurnoAgenda;
     RETURN CAST(nuevoTurnoAgenda AS CHARACTER VARYING);
   END;
-$$
-;
+
+$$;
 
 create function agenda_presente(id_agenda_in integer, presente_in boolean) returns character varying
 	language plpgsql
@@ -507,6 +529,42 @@ DECLARE
   END;
 $$
 ;
+
+create function medicos_crear_anulacion(id_medico_in INTEGER, fecha_in DATE, id_hr_desde_in INTEGER, id_hr_hasta_in INTEGER, observaciones_in TEXT)
+  returns CHARACTER VARYING LANGUAGE plpgsql AS $$
+  DECLARE
+    medicoExiste INTEGER;
+    horarioExiste1 INTEGER;
+    horarioExiste2 INTEGER;
+    anulacionExiste INTEGER;
+  BEGIN
+    IF fecha_in < current_date THEN
+      RETURN 'error-fecha';
+    END IF;
+    SELECT id INTO medicoExiste FROM medicos WHERE id = id_medico_in;
+    IF medicoExiste IS NULL THEN
+      RETURN 'error-medico';
+    END IF;
+    SELECT id INTO horarioExiste1 FROM turnos WHERE id = id_hr_desde_in;
+    IF horarioExiste1 IS NULL THEN
+      RETURN 'error-desde';
+    END IF;
+    IF id_hr_desde_in > id_hr_hasta_in THEN
+      RETURN 'error-rango';
+    END IF;
+    SELECT id INTO horarioExiste2 FROM turnos WHERE id = id_hr_hasta_in;
+    IF horarioExiste2 IS NULL THEN
+      RETURN 'error-hasta';
+    END IF;
+    SELECT id INTO anulacionExiste FROM anulaciones WHERE fecha = fecha_in;
+    IF anulacionExiste IS NOT NULL THEN
+      RETURN 'error-anulacion';
+    END IF;
+    INSERT INTO anulaciones (id_medico, fecha, id_horario_desde, id_horario_hasta, observaciones)
+      VALUES (medicoExiste, fecha_in, horarioExiste1, horarioExiste2, observaciones_in);
+    RETURN 'ok';
+  END;
+  $$;
 
 create function obra_social_borrar(id_in integer) returns character varying
 	language plpgsql

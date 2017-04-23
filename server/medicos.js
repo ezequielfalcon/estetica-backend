@@ -12,6 +12,152 @@ module.exports = function(db, pgp){
     module.borrar = borrar;
     module.traer = traer;
     module.modificar = modificar;
+    module.nuevaAnulacion = nuevaAnulacion;
+    module.verAnulaciones = verAnulaciones;
+    module.borrarAnulacion = borrarAnulacion;
+
+    function borrarAnulacion(req, res){
+        var token = req.headers['x-access-token'];
+        if (token){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
+                if (err){
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
+                }
+                else{
+                    if (decoded.rol === "admin"){
+                        if (req.params.id){
+                            db.none('DELETE FROM anulaciones WHERE id = $1', req.params.id)
+                                .then(function () {
+                                    res.json({resultado: true})
+                                })
+                                .catch(function (err) {
+                                    res.status(500).json({resutado: false, mensaje: err})
+                                })
+                        }
+                        else{
+                            console.log("Borrar Anulacion sin todos los datos necesarios");
+                            res.status(400).json({resultado: false, mensaje: "Faltan datos"})
+                        }
+                    }
+                    else{
+                        console.log("Usuario " + decoded.nombre + " no autorizado");
+                        res.status(403).json({resultado: false, mensaje:"No tiene permiso para borrar anulaciones!"});
+                    }
+                }
+            });
+        }
+        else{
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
+
+    function verAnulaciones(req, res){
+        var token = req.headers['x-access-token'];
+        if (token){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
+                if (err){
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
+                }
+                else{
+                    if (req.params.fecha){
+                        db.manyOrNone("select anulaciones.id, concat(medicos.nombre, ' ', medicos.apellido) medico, anulaciones.fecha, anulaciones.id_horario_desde, anulaciones.id_horario_hasta, anulaciones.observaciones  from anulaciones inner join medicos on anulaciones.id_medico = medicos.id where fecha = $1;", req.params.fecha)
+                            .then(function(data){
+                                res.json({resultado: true, datos: data})
+                            })
+                            .catch(function(err){
+                                console.log(err);
+                                res.status(500).json({resultado: false, mensaje: err})
+                            })
+                    }
+                    else{
+                        db.manyOrNone("select anulaciones.id, concat(medicos.nombre, ' ', medicos.apellido) medico, anulaciones.fecha, anulaciones.id_horario_desde, anulaciones.id_horario_hasta, anulaciones.observaciones  from anulaciones inner join medicos on anulaciones.id_medico = medicos.id WHERE anulaciones.fecha >= current_date;")
+                            .then(function(data){
+                                res.json({resultado: true, datos: data})
+                            })
+                            .catch(function(err){
+                                console.log(err);
+                                res.status(500).json({resultado: false, mensaje: err})
+                            })
+                    }
+                }
+            });
+        }
+        else{
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
+
+    function nuevaAnulacion(req, res){
+        var token = req.headers['x-access-token'];
+        if (token){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
+                if (err){
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
+                }
+                else{
+                    console.log("Usuario " + decoded.nombre + " autorizado");
+                    if (decoded.rol === "admin"){
+                        if (req.body.id_medico && req.body.fecha && req.body.desde && req.body.hasta && req.body.observaciones){
+                            db.func("medicos_crear_anulacion", [req.body.id_medico, req.body.fecha, req.body.desde, req.body.hasta, req.body.observaciones], qrm.one)
+                                .then(function(data){
+                                    if (data.medicos_crear_anulacion === 'error-fecha'){
+                                        res.status(400).json({resultado: false, mensaje: "Sólo se pueden crear anulaciones de hoy en adelante"})
+                                    }
+                                    else if (data.medicos_crear_anulacion === 'error-medico'){
+                                        res.status(400).json({resultado: false, mensaje: "No se encuentra el médico seleccionado"});
+                                    }
+                                    else if(data.medicos_crear_anulacion === 'error-desde'){
+                                        res.status(400).json({resultado: false, mensaje: "No se encuentra el horario de inicio"});
+                                    }
+                                    else if(data.medicos_crear_anulacion === 'error-hasta'){
+                                        res.status(400).json({resultado: false, mensaje: "No se encuentra el horario de final"});
+                                    }
+                                    else if(data.medicos_crear_anulacion === 'error-rango'){
+                                        res.status(400).json({resultado: false, mensaje: "Los hoarios deben ser de menor a mayor"});
+                                    }
+                                    else if(data.medicos_crear_anulacion === 'error-anulacion'){
+                                        res.status(400).json({resultado: false, mensaje: "Ya existe una anulación para ese Médico en la fecha especificada"});
+                                    }
+                                    else if(data.medicos_crear_anulacion === 'ok'){
+                                        res.json({resultado: true, mensaje: "Anulación creada"})
+                                    }
+                                    else {
+                                        res.status(500).json({resultado: false, mensaje: "Error interno: " + data.medicos_crear_anulacion});
+                                    }
+                                })
+                                .catch(function(err){
+                                    console.log(err);
+                                    res.status(500).json({resultado: false, mensaje: err})
+                                })
+                        }
+                        else{
+                            console.log("Anuacion sin todos los datos necesarios");
+                            res.status(400).json({resultado: false, mensaje: "Faltan datos para crear la anulación"})
+                        }
+                    }
+                    else{
+                        console.log("Usuario " + decoded.nombre + " no autorizado");
+                        res.status(403).json({resultado: false, mensaje:"No tiene permiso para crear anulaciones!"});
+                    }
+                }
+            });
+        }
+        else{
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
 
     function modificar(req, res){
         var token = req.headers['x-access-token'];
