@@ -226,6 +226,9 @@ module.exports = function(db, pgp) {
                                 else if (data.agenda_nuevo_turno == 'error-agenda') {
                                     res.status(400).json({resultado: false, mensaje: "Ya existe un turno en ese horario y consultorio!"})
                                 }
+                                else if (data.agenda_nuevo_turno === 'error-ausente') {
+                                    res.status(400).json({resultado: false, mensaje: "Médico ausente!"})
+                                }
                                 else {
                                     res.json({resultado: true, mensaje: "Turno creado con ID: " + data.agenda_nuevo_turno, id: data.agenda_nuevo_turno})
                                 }
