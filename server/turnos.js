@@ -15,6 +15,46 @@ module.exports = function(db, pgp) {
     module.agendaPresente = agendaPresente;
     module.borrarTurno = borrarTurno;
     module.verHorarios = verHorarios;
+    module.modificarCosto = modificarCosto;
+
+    function modificarCosto(req,res) {
+        var token = req.headers['x-access-token'];
+        if (token){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
+                if (err){
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
+                }
+                else{
+                    if (decoded.rol === 'admin' || decoded.rol === 'usuario'){
+                        if (req.params.id && req.body.costo){
+                            db.none("UPDATE agenda SET costo = $1 WHERE id = $2;", [req.body.costo ,req.params.id], qrm.one)
+                                .then(function(){
+                                    res.json({resultado: true, mensaje: "Costo modificado!"})
+                                })
+                                .catch(function(err){
+                                    console.log(err);
+                                    res.status(500).json({resultado: false, mensaje: err})
+                                })
+                        }
+                        else{
+                            console.log("Agenda sin todos los datos necesarios");
+                            res.status(400).json({resultado: false, mensaje: "Faltan datos para modificar el costo"})
+                        }
+                    }
+                    else{
+                        res.status(403).json({resultado: false, mensaje: "No tiene permiso para modificar el costo"});
+                    }
+                }
+            });
+        }
+        else{
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
 
     function verHorarios(req, res){
         var token = req.headers['x-access-token'];

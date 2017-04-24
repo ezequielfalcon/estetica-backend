@@ -100,6 +100,7 @@ app.get('/api/agenda/:fecha', turnos.agendaResumen);
 app.post('/api/nuevo-turno', turnos.crearTurno);
 app.post('/api/agregar-tratamiento', turnos.nuevoTratamientoTurno);
 app.post('/api/turno-presente', turnos.agendaPresente);
+app.put('/api/agenda/modificar-costo/:id', turnos.modificarCosto);
 
 //cuenta corriente
 app.get('/api/cuenta-corriente/:id', ctacte.consultar);
