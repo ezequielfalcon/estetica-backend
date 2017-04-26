@@ -92,7 +92,7 @@ module.exports = function(db, pgp){
                             })
                     }
                     else{
-                        db.manyOrNone("SELECT * FROM obras_sociales;")
+                        db.manyOrNone("SELECT * FROM obras_sociales ORDER BY nombre ASC;")
                             .then(function (data){
                                 res.json({resultado: true, datos: data})
                             })
