@@ -118,7 +118,7 @@ module.exports = function(db, pgp){
                             db.func("paciente_crear", [req.body.nombre, req.body.apellido, req.body.documento,
                                 req.body.fecha, req.body.telefono, req.body.mail,
                                 req.body.sexo, req.body.id_os, req.body.numero_os,
-                                req.body.domicilio, req.body.obs && req.body.celular], qrm.one)
+                                req.body.domicilio, req.body.obs, req.body.celular], qrm.one)
                                 .then(function(data){
                                     if (data.paciente_crear == 'error-paciente'){
                                         res.status(400).json({resultado: false, mensaje: "ya existe una Paciente con ese DNI"})
@@ -174,7 +174,7 @@ module.exports = function(db, pgp){
                                 req.body.apellido, req.body.documento,
                                 req.body.fecha, req.body.telefono, req.body.mail,
                                 req.body.sexo, req.body.id_os, req.body.numero_os,
-                                req.body.domicilio, req.body.obs && req.body.celular], qrm.one)
+                                req.body.domicilio, req.body.obs, req.body.celular], qrm.one)
                                 .then(function(data){
                                     if (data.paciente_modificar == 'error-paciente'){
                                         res.status(404).json({resultado: false, mensaje: "No se encuentra el paciente"})
