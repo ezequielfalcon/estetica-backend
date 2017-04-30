@@ -242,7 +242,7 @@ module.exports = function (db, pgp) {
                 else{
                     if (req.body.clave_old && req.body.clave_new){
                         var hash_new = bcrypt.hashSync(req.body.clave_new, 10);
-                        db.none('UPDATE usuarios SET clave = $1 WHERE nombre = $2;', [hash_new, decoded.usuario])
+                        db.none('UPDATE usuarios SET clave = $1 WHERE nombre = $2;', [hash_new, decoded.nombre])
                             .then(function(){
                                 res.json({resultado: true, mensaje: "Clave cambiada!"});
                             })
