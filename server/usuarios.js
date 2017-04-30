@@ -241,34 +241,21 @@ module.exports = function (db, pgp) {
                 }
                 else{
                     if (req.body.clave_old && req.body.clave_new){
-                        var hash_old = bcrypt.hashSync(req.body.clave_old, 10);
                         var hash_new = bcrypt.hashSync(req.body.clave_new, 10);
-                        db.func('usuario_modificar_clave', [decoded.usuario, hash_old, hash_new], qrm.one)
-                            .then(function(data){
-                                if (data.usuario_modificar_clave === 'error-usuario-clave'){
-                                    res.status(400).json({resultado: false, mensaje: "Error de credenciales"})
-                                }
-                                else if (data.usuario_modificar_clave === 'error-clave'){
-                                    res.status(400).json({resultado: false, mensaje: "La nueva clave debe ser distinta de la anterior"});
-                                }
-                                else if (data.usuario_modificar_clave === 'ok'){
-                                    res.json({resultado: true, mensaje: "Clave cambiada!"});
-                                }
-                                else{
-                                    console.log("Error de DB en usuario_modificar_rol: " + data);
-                                    res.status(500).json({resultado: false, mensaje: "error no especificado"});
-                                }
+                        db.none('UPDATE usuarios SET clave = $1 WHERE nombre = $2;', [hash_new, decoded.usuario])
+                            .then(function(){
+                                res.json({resultado: true, mensaje: "Clave cambiada!"});
                             })
                             .catch(function(err){
                                 console.log(err);
                                 res.status(500).json({resultado: false, mensaje: err});
                             })
-                        }
-                        else{
-                            console.log("Usuario POST sin todos los datos necesarios");
-                            res.status(400).json({resultado: false, mensaje: "Faltan datos en el POST"})
-                        }
                     }
+                    else{
+                        console.log("Usuario POST sin todos los datos necesarios");
+                        res.status(400).json({resultado: false, mensaje: "Faltan datos en el POST"})
+                    }
+                }
             });
         }
         else{
