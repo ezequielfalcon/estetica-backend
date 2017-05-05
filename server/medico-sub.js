@@ -75,7 +75,7 @@ module.exports = function(db, pgp) {
                     if (decoded.rol === 'medico'){
                         var medicoString = decoded.nombre;
                         if (req.params.fecha){
-                            db.manyOrNone("select agenda.id, concat(pacientes.nombre, ' ', pacientes.apellido) paciente, agenda.id_consultorio, agenda.id_turno, agenda.entreturno, agenda.presente, agenda.atendido, agenda.hora_llegada from agenda inner join pacientes on agenda.id_paciente = pacientes.id  inner join medicos on agenda.id_medico = medicos.id INNER JOIN usuario_medico ON medicos.id = usuario_medico.id_medico inner join usuarios ON usuario_medico.usuario = usuarios.nombre where usuarios.nombre = $1 AND agenda.fecha =  $2;",
+                            db.manyOrNone("select agenda.id, concat(pacientes.apellido, ' ', pacientes.nombre) paciente, agenda.id_consultorio, agenda.id_turno, agenda.entreturno, agenda.presente, agenda.atendido, agenda.hora_llegada from agenda inner join pacientes on agenda.id_paciente = pacientes.id  inner join medicos on agenda.id_medico = medicos.id INNER JOIN usuario_medico ON medicos.id = usuario_medico.id_medico inner join usuarios ON usuario_medico.usuario = usuarios.nombre where usuarios.nombre = $1 AND agenda.fecha =  $2;",
                                 [medicoString, req.params.fecha])
                                 .then(function(data){
                                     res.json({resultado: true, datos: data})
