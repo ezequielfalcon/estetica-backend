@@ -119,7 +119,7 @@ app.get('/api/sub-medicos/turnos/:fecha', medicosSub.turnos);
 app.put('/api/sub-medicos/turnos/:id', medicosSub.atendido);
 
 var reportingApp = express();
-app.use('/reporting', reportingApp);
+app.use('/reportes', reportingApp);
 
 app.get('/api', function(req, res) {
     res.json({
