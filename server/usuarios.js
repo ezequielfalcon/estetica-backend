@@ -240,34 +240,20 @@ module.exports = function (db, pgp) {
                     res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
-                    if (decoded.rol == 'admin'){
-                        if (req.body.usuario && req.body.clave){
-                            var hash = bcrypt.hashSync(req.body.clave, 10);
-                            db.func('usuario_modificar_clave_admin', [req.body.usuario, req.body.rol], qrm.one)
-                                .then(function(data){
-                                    if (data.usuario_modificar_clave_admin == 'error-usuario'){
-                                        res.status(400).json({resultado: false, mensaje: "No se encontró el usuario " + req.body.usuario})
-                                    }
-                                    else if (data.usuario_modificar_clave_admin == 'ok'){
-                                        res.status(200).json({resultado: true, mensaje: "usuario modificado"});
-                                    }
-                                    else{
-                                        console.log("Error de DB en usuario_modificar_rol: " + data);
-                                        res.status(500).json({resultado: false, mensaje: "error no especificado"});
-                                    }
-                                })
-                                .catch(function(err){
-                                    console.log(err);
-                                    res.status(500).json({resultado: false, mensaje: err});
-                                })
-                        }
-                        else{
-                            console.log("Usuario POST sin todos los datos necesarios");
-                            res.status(400).json({resultado: false, mensaje: "Faltan datos en el POST"})
-                        }
+                    if (req.body.clave_old && req.body.clave_new){
+                        var hash_new = bcrypt.hashSync(req.body.clave_new, 10);
+                        db.none('UPDATE usuarios SET clave = $1 WHERE nombre = $2;', [hash_new, decoded.nombre])
+                            .then(function(){
+                                res.json({resultado: true, mensaje: "Clave cambiada!"});
+                            })
+                            .catch(function(err){
+                                console.log(err);
+                                res.status(500).json({resultado: false, mensaje: err});
+                            })
                     }
                     else{
-                        res.status(403).json({resultado: false, mensaje: "No autorizado!"});
+                        console.log("Usuario POST sin todos los datos necesarios");
+                        res.status(400).json({resultado: false, mensaje: "Faltan datos en el POST"})
                     }
                 }
             });

@@ -16,6 +16,7 @@ module.exports = function(db, pgp) {
     module.borrarTurno = borrarTurno;
     module.verHorarios = verHorarios;
     module.modificarCosto = modificarCosto;
+    module.turnoPorId = verTurnoPorId;
 
     function modificarCosto(req,res) {
         var token = req.headers['x-access-token'];
@@ -327,7 +328,7 @@ module.exports = function(db, pgp) {
                             })
                     }
                     else if (req.params.fecha && req.params.medico){
-                        db.manyOrNone("SELECT agenda.id, CONCAT(pacientes.nombre, ' ', pacientes.apellido) paciente, agenda.id_consultorio, agenda.id_turno, agenda.entreturno, agenda.presente, agenda.atendido, agenda.hora_llegada, agenda.costo FROM agenda INNER JOIN medicos on agenda.id_medico = medicos.id INNER JOIN pacientes ON agenda.id_paciente = pacientes.id WHERE agenda.fecha = $1 AND agenda.id_medico = $2 ORDER BY agenda.id_turno;", [req.params.fecha, req.params.medico])
+                        db.manyOrNone("SELECT agenda.id, CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente, CONCAT(pacientes.telefono, ' | ', pacientes.celular) telefono, agenda.id_consultorio, agenda.id_turno, agenda.entreturno, agenda.presente, agenda.atendido, agenda.hora_llegada, agenda.costo FROM agenda INNER JOIN medicos on agenda.id_medico = medicos.id INNER JOIN pacientes ON agenda.id_paciente = pacientes.id WHERE agenda.fecha = $1 AND agenda.id_medico = $2 ORDER BY agenda.id_turno;", [req.params.fecha, req.params.medico])
                             .then(function(data) {
                                 res.json({
                                     resultado: true,
@@ -344,6 +345,47 @@ module.exports = function(db, pgp) {
                     }
                     else if(req.params.fecha){
                         db.manyOrNone("SELECT * FROM agenda WHERE fecha = $1;", req.params.fecha)
+                            .then(function(data) {
+                                res.json({
+                                    resultado: true,
+                                    datos: data
+                                });
+                            })
+                            .catch(function(error) {
+                                console.log(error);
+                                res.status(500).json({
+                                    resultado: false,
+                                    mensaje: "Error interno al ver agenda: " + error
+                                });
+                            })
+                    }
+                    else {
+                        console.log("Agenda sin todos los datos necesarios");
+                        res.status(400).json({resultado: false, mensaje: "Faltan parámetros para ver los turnos"})
+                    }
+                }
+            });
+        } else {
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
+
+    function verTurnoPorId(req,res){
+        var token = req.headers['x-access-token'];
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+                if (err) {
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({
+                        resultado: false,
+                        mensaje: "Error de autenticación"
+                    });
+                } else {
+                    if (req.params.id){
+                        db.manyOrNone("SELECT agenda.id, CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente, CONCAT(pacientes.telefono, ' | ', pacientes.celular) telefono, agenda.id_consultorio, agenda.id_turno, agenda.entreturno, agenda.presente, agenda.atendido, agenda.hora_llegada, agenda.costo FROM agenda INNER JOIN medicos on agenda.id_medico = medicos.id INNER JOIN pacientes ON agenda.id_paciente = pacientes.id WHERE agenda.id = $1;", req.params.id)
                             .then(function(data) {
                                 res.json({
                                     resultado: true,
