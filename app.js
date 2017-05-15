@@ -147,6 +147,7 @@ var jsreport = require('jsreport')({
         name: "mongodb",
         uri: process.env.MONGODB_URI
     },
+    blobStorage: "gridFS",
     authentication: {
         cookieSession: {
             "secret": "dasd321as56d1sd5s61vdv32"
