@@ -2,7 +2,16 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var pgp = require("pg-promise")();
-var db = pgp(process.env.DATABASE_URL);
+
+var cn = {
+    host: 'localhost',
+    port: 5432,
+    database: 'estetica',
+    user: 'falco',
+    password: '1234'
+};
+
+var db = pgp(process.env.DATABASE_URL || cn);
 
 var seguridad = require('./server/seguridad.js')(db);
 var usuarios = require('./server/usuarios.js')(db, pgp);
@@ -135,6 +144,7 @@ var jsreport = require('jsreport')({
     express: { app :reportingApp, server: server },
     appPath: "/reportes"
 });
+jsreport.use(require('jsreport-authentication')({}));
 
 jsreport.init().catch(function (e) {
     console.error(e);
