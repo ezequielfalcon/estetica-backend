@@ -1,0 +1,16 @@
+{
+  "authentication" : {
+    "cookieSession": {
+      "secret": "dasd321as56d1sd5s61vdv32"
+    },
+    "admin": {
+      "username" : "admin",
+      "password": "password"
+    }
+  },
+  "connectionString": {
+    "name": "mongodb",
+    "uri": "mongodb://heroku_rb4sl4hf:4g49dk0sbt2943j8uqvk6mnb11@ds143241.mlab.com:43241/heroku_rb4sl4hf"
+  },
+  "blobStorage": "gridFS"
+}
