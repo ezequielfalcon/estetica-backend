@@ -118,12 +118,24 @@ app.get('/api/cuenta-corriente', ctacte.consultar);
 app.get('/api/sub-medicos/turnos/:fecha', medicosSub.turnos);
 app.put('/api/sub-medicos/turnos/:id', medicosSub.atendido);
 
+var reportingApp = express();
+app.use('/reportes', reportingApp);
+
 app.get('/api', function(req, res) {
     res.json({
         mensaje: "Backend del sistema!!"
     })
 });
 
-app.listen(app.get('port'), function() {
+var server = app.listen(app.get('port'), function() {
     console.log('Backend escuchando en puerto ', app.get('port'));
+});
+
+var jsreport = require('jsreport')({
+    express: { app :reportingApp, server: server },
+    appPath: "/reportes"
+});
+
+jsreport.init().catch(function (e) {
+    console.error(e);
 });
