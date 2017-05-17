@@ -2,7 +2,16 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var pgp = require("pg-promise")();
-var db = pgp(process.env.DATABASE_URL);
+
+var cn = {
+    host: 'localhost',
+    port: 5432,
+    database: 'estetica',
+    user: 'falco',
+    password: '1234'
+};
+
+var db = pgp(process.env.DATABASE_URL || cn);
 
 var seguridad = require('./server/seguridad.js')(db);
 var usuarios = require('./server/usuarios.js')(db, pgp);
@@ -133,8 +142,23 @@ var server = app.listen(app.get('port'), function() {
 
 var jsreport = require('jsreport')({
     express: { app :reportingApp, server: server },
-    appPath: "/reportes"
+    appPath: "/reportes",
+    connectionString: {
+        name: "mongodb",
+        uri: process.env.MONGODB_URI
+    },
+    blobStorage: "gridFS",
+    authentication: {
+        cookieSession: {
+            "secret": "dasd321as56d1sd5s61vdv32"
+        },
+        admin: {
+            "username" : "admin",
+            "password": process.env.JSREPORT_PASS
+        }
+    }
 });
+jsreport.use(require('jsreport-authentication')({}));
 
 jsreport.init().catch(function (e) {
     console.error(e);
