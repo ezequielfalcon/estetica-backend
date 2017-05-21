@@ -28,8 +28,9 @@ module.exports = function(db, pgp) {
                 }
                 else{
                     if (decoded.rol === 'admin' || decoded.rol === 'usuario'){
-                        if (req.params.id && req.body.costo){
-                            db.none("UPDATE agenda SET costo = $1 WHERE id = $2;", [req.body.costo ,req.params.id], qrm.one)
+                        if (req.params.id && req.body.costo && req.body.costo2 && req.body.costo3){
+                            db.none("UPDATE agenda SET costo = $1, costo2 = $2, costo3 = $3 WHERE id = $4;",
+                                [req.body.costo, req.body.costo2, req.body.costo3 ,req.params.id], qrm.one)
                                 .then(function(){
                                     res.json({resultado: true, mensaje: "Costo modificado!"})
                                 })
@@ -328,7 +329,7 @@ module.exports = function(db, pgp) {
                             })
                     }
                     else if (req.params.fecha && req.params.medico){
-                        db.manyOrNone("SELECT agenda.id, CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente, CONCAT(pacientes.telefono, ' | ', pacientes.celular) telefono, agenda.id_consultorio, agenda.id_turno, agenda.entreturno, agenda.presente, agenda.atendido, agenda.hora_llegada, agenda.costo FROM agenda INNER JOIN medicos on agenda.id_medico = medicos.id INNER JOIN pacientes ON agenda.id_paciente = pacientes.id WHERE agenda.fecha = $1 AND agenda.id_medico = $2 ORDER BY agenda.id_turno;", [req.params.fecha, req.params.medico])
+                        db.manyOrNone("SELECT agenda.id, CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente, CONCAT(pacientes.telefono, ' | ', pacientes.celular) telefono, agenda.id_consultorio, agenda.id_turno, agenda.entreturno, agenda.presente, agenda.atendido, agenda.hora_llegada, agenda.costo, agenda.costo2, agenda.costo3 FROM agenda INNER JOIN medicos on agenda.id_medico = medicos.id INNER JOIN pacientes ON agenda.id_paciente = pacientes.id WHERE agenda.fecha = $1 AND agenda.id_medico = $2 ORDER BY agenda.id_turno;", [req.params.fecha, req.params.medico])
                             .then(function(data) {
                                 res.json({
                                     resultado: true,
@@ -385,7 +386,7 @@ module.exports = function(db, pgp) {
                     });
                 } else {
                     if (req.params.id){
-                        db.manyOrNone("SELECT agenda.id, CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente, CONCAT(pacientes.telefono, ' | ', pacientes.celular) telefono, agenda.id_consultorio, agenda.id_turno, agenda.entreturno, agenda.presente, agenda.atendido, agenda.hora_llegada, agenda.costo FROM agenda INNER JOIN medicos on agenda.id_medico = medicos.id INNER JOIN pacientes ON agenda.id_paciente = pacientes.id WHERE agenda.id = $1;", req.params.id)
+                        db.manyOrNone("SELECT agenda.id, CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente, CONCAT(pacientes.telefono, ' | ', pacientes.celular) telefono, agenda.id_consultorio, agenda.id_turno, agenda.entreturno, agenda.presente, agenda.atendido, agenda.hora_llegada, agenda.costo, agenda.costo2, agenda.costo3 FROM agenda INNER JOIN medicos on agenda.id_medico = medicos.id INNER JOIN pacientes ON agenda.id_paciente = pacientes.id WHERE agenda.id = $1;", req.params.id)
                             .then(function(data) {
                                 res.json({
                                     resultado: true,
