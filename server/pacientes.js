@@ -26,7 +26,7 @@ module.exports = function(db, pgp){
                         var nom = req.body.nombre + '%' || '%';
                         var ape = req.body.apellido + '%' || '%';
                         var dni = req.body.documento + '%' || '%';
-                        db.manyOrNone("select * from pacientes where nombre ILIKE $1 AND apellido ILIKE $2 AND documento ILIKE $3 ORDER BY apellido ASC, nombre ASC LIMIT 50;",
+                        db.manyOrNone("select * from pacientes where nombre ILIKE $1 AND apellido ILIKE $2 AND documento ILIKE $3 ORDER BY UPPER(apellido) ASC, UPPER(nombre) ASC LIMIT 50;",
                             [nom, ape, dni])
                             .then(function(data){
                                 res.json({resultado: true, datos: data})
