@@ -32,7 +32,8 @@ module.exports = function(db, pgp) {
                     });
                 } else {
                     if (req.params.paciente) {
-
+                        //TODO
+                        res.status(500).json({resultado: false, mensaje: "No implementado"})
                     }
                     else{
                         res.status(400).json({resultado: false, mensaje: "Debe especificar un ID de paciente"})
