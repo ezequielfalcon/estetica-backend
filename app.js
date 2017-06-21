@@ -1,9 +1,9 @@
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
-var pgp = require("pg-promise")();
+let express = require('express');
+let app = express();
+let bodyParser = require('body-parser');
+const pgp = require("pg-promise")();
 
-var cn = {
+const cn = {
     host: 'localhost',
     port: 5432,
     database: 'estetica',
@@ -11,19 +11,19 @@ var cn = {
     password: '1234'
 };
 
-var db = pgp(process.env.DATABASE_URL || cn);
+const db = pgp(process.env.DATABASE_URL || cn);
 
-var seguridad = require('./server/seguridad.js')(db);
-var usuarios = require('./server/usuarios.js')(db, pgp);
-var obras_sociales = require('./server/obras_sociales')(db, pgp);
-var roles = require('./server/roles.js')(db, pgp);
-var pacientes = require('./server/pacientes')(db, pgp);
-var medicos = require('./server/medicos')(db, pgp);
-var consultorios = require('./server/consultorios')(db, pgp);
-var turnos = require('./server/turnos')(db, pgp);
-var tratamientos = require('./server/tratamientos')(db, pgp);
-var ctacte = require('./server/cuenta_corriente')(db, pgp);
-var medicosSub = require('./server/medico-sub')(db, pgp);
+const seguridad = require('./server/seguridad.js')(db);
+const usuarios = require('./server/usuarios.js')(db, pgp);
+const obras_sociales = require('./server/obras_sociales')(db, pgp);
+const roles = require('./server/roles.js')(db, pgp);
+const pacientes = require('./server/pacientes')(db, pgp);
+const medicos = require('./server/medicos')(db, pgp);
+const consultorios = require('./server/consultorios')(db, pgp);
+const turnos = require('./server/turnos')(db, pgp);
+const tratamientos = require('./server/tratamientos')(db, pgp);
+const ctacte = require('./server/cuenta_corriente')(db, pgp);
+const medicosSub = require('./server/medico-sub')(db, pgp);
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -119,6 +119,7 @@ app.post('/api/turno-presente', turnos.agendaPresente);
 app.put('/api/agenda/modificar-costo/:id', turnos.modificarCosto);
 //nueva query para listados
 app.get('/api/listado-turnos/:fecha/:medico', turnos.verTurnosListado);
+app.get('/api/listado-turnos2/:fecha/:medico', turnos.verTurnosListadoNew);
 //turnos por paciente
 app.get('/api/turnos-paciente/:paciente');
 
@@ -131,7 +132,7 @@ app.get('/api/cuenta-corriente', ctacte.consultar);
 app.get('/api/sub-medicos/turnos/:fecha', medicosSub.turnos);
 app.put('/api/sub-medicos/turnos/:id', medicosSub.atendido);
 
-var reportingApp = express();
+const reportingApp = express();
 app.use('/reportes', reportingApp);
 
 app.get('/api', function(req, res) {
@@ -140,12 +141,12 @@ app.get('/api', function(req, res) {
     })
 });
 
-var server = app.listen(app.get('port'), function() {
+const server = app.listen(app.get('port'), function () {
     console.log('Backend escuchando en puerto ', app.get('port'));
 });
 
-var jsreport = require('jsreport')({
-    express: { app :reportingApp, server: server },
+const jsreport = require('jsreport')({
+    express: {app: reportingApp, server: server},
     appPath: "/reportes",
     connectionString: {
         name: "mongodb",
@@ -157,7 +158,7 @@ var jsreport = require('jsreport')({
             "secret": "dasd321as56d1sd5s61vdv32"
         },
         admin: {
-            "username" : "admin",
+            "username": "admin",
             "password": process.env.JSREPORT_PASS
         }
     }
