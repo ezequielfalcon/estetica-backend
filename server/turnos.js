@@ -18,6 +18,34 @@ module.exports = function(db, pgp) {
     module.modificarCosto = modificarCosto;
     module.turnoPorId = verTurnoPorId;
     module.verTurnosListado = verTurnosListados;
+    module.turnosPorPaciente = turnosPorPaciente;
+
+    function turnosPorPaciente(req, res) {
+        var token = req.headers['x-access-token'];
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+                if (err) {
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({
+                        resultado: false,
+                        mensaje: "Error de autenticación"
+                    });
+                } else {
+                    if (req.params.paciente) {
+
+                    }
+                    else{
+                        res.status(400).json({resultado: false, mensaje: "Debe especificar un ID de paciente"})
+                    }
+                }
+            });
+        } else {
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
 
     function modificarCosto(req,res) {
         var token = req.headers['x-access-token'];
