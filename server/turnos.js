@@ -33,7 +33,7 @@ module.exports = function(db, pgp) {
                     });
                 } else {
                     if (req.params.fecha && req.params.medico){
-                        db.manyOrNone("select DISTINCT ON (agenda.id_paciente) id_paciente, CONCAT(pacientes.apellido, '', pacientes.nombre) paciente " +
+                        db.manyOrNone("select DISTINCT ON (agenda.id_paciente) id_paciente, CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente " +
                             "from agenda " +
                             "inner join pacientes on agenda.id_paciente = pacientes.id " +
                             "where fecha = $1 and id_medico = $2;"
@@ -84,7 +84,7 @@ module.exports = function(db, pgp) {
                             })
                     }
                     else if (req.params.fecha) {
-                        db.manyOrNone("select DISTINCT ON (agenda.id_paciente) id_paciente, CONCAT(pacientes.apellido, '', pacientes.nombre) paciente " +
+                        db.manyOrNone("select DISTINCT ON (agenda.id_paciente) id_paciente, CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente " +
                             "from agenda " +
                             "inner join pacientes on agenda.id_paciente = pacientes.id " +
                             "where fecha = $1;"
