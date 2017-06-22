@@ -18,6 +18,174 @@ module.exports = function(db, pgp) {
     module.modificarCosto = modificarCosto;
     module.turnoPorId = verTurnoPorId;
     module.verTurnosListado = verTurnosListados;
+    module.turnosPorPaciente = turnosPorPaciente;
+    module.verTurnosListadoNew = verTurnosListadoNew;
+
+    function verTurnosListadoNew(req, res) {
+        let token = req.headers['x-access-token'];
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+                if (err) {
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({
+                        resultado: false,
+                        mensaje: "Error de autenticación"
+                    });
+                } else {
+                    if (req.params.fecha && req.params.medico){
+                        db.manyOrNone("select DISTINCT ON (agenda.id_paciente) id_paciente, CONCAT(pacientes.apellido, '', pacientes.nombre) paciente " +
+                            "from agenda " +
+                            "inner join pacientes on agenda.id_paciente = pacientes.id " +
+                            "where fecha = $1 and id_medico = $2;"
+                        ,[req.params.fecha, req.params.medico])
+                            .then(pacientes => {
+                                if (pacientes) {
+                                    let resultadoPacientes = [];
+                                    let pacientesListos = 0;
+                                    for (let paciente of pacientes) {
+                                        let nuevoTurno = {};
+                                        nuevoTurno.id_paciente = paciente.id_paciente;
+                                        nuevoTurno.paciente = paciente.paciente;
+                                        db.one('SELECT * FROM agenda WHERE id_paciente = $1 AND agenda.fecha = $2 AND agenda.id_medico = $3 ORDER BY id_turno ASC, entreturno ASC LIMIT 1;'
+                                        ,[paciente.id_paciente, req.params.fecha, req.params.medico])
+                                            .then(turno => {
+                                                nuevoTurno.id = turno.id;
+                                                nuevoTurno.telefono = turno.telefono;
+                                                nuevoTurno.id_consultorio = turno.id_consultorio;
+                                                nuevoTurno.id_turno = turno.id_turno;
+                                                nuevoTurno.entreturno = turno.entreturno;
+                                                nuevoTurno.presente = turno.presente;
+                                                nuevoTurno.atendido = turno.atendido;
+                                                nuevoTurno.hora_llegada = turno.hora_llegada;
+                                                nuevoTurno.costo = turno.costo;
+                                                nuevoTurno.costo2 = turno.costo2;
+                                                nuevoTurno.costo3 = turno.costo3;
+                                                nuevoTurno.usuario = turno.usuario;
+                                                pacientesListos++;
+                                                resultadoPacientes.push(nuevoTurno);
+                                                if (pacientesListos === pacientes.length) {
+                                                    resultadoPacientes.sort(ordenarTurnos);
+                                                    res.json({resultado: true, datos: resultadoPacientes})
+                                                }
+                                            })
+                                            .catch(function(err){
+                                                console.log(err);
+                                                res.status(500).json({resultado: false, mensaje: err})
+                                            })
+                                    }
+                                }
+                                else {
+                                    res.json({resultado: true, datos:{}})
+                                }
+                            })
+                            .catch(function(err){
+                                console.log(err);
+                                res.status(500).json({resultado: false, mensaje: err})
+                            })
+                    }
+                    else if (req.params.fecha) {
+                        db.manyOrNone("select DISTINCT ON (agenda.id_paciente) id_paciente, CONCAT(pacientes.apellido, '', pacientes.nombre) paciente " +
+                            "from agenda " +
+                            "inner join pacientes on agenda.id_paciente = pacientes.id " +
+                            "where fecha = $1;"
+                            ,[req.params.fecha])
+                            .then(pacientes => {
+                                if (pacientes) {
+                                    let resultadoPacientes = [];
+                                    let pacientesListos = 0;
+                                    for (let paciente of pacientes) {
+                                        let nuevoTurno = {};
+                                        nuevoTurno.id_paciente = paciente.id_paciente;
+                                        nuevoTurno.paciente = paciente.paciente;
+                                        db.one('SELECT * FROM agenda WHERE id_paciente = $1 AND agenda.fecha = $2 ORDER BY id_turno ASC, entreturno ASC LIMIT 1;'
+                                            ,[paciente.id_paciente, req.params.fecha])
+                                            .then(turno => {
+                                                nuevoTurno.id = turno.id;
+                                                nuevoTurno.telefono = turno.telefono;
+                                                nuevoTurno.id_consultorio = turno.id_consultorio;
+                                                nuevoTurno.id_turno = turno.id_turno;
+                                                nuevoTurno.entreturno = turno.entreturno;
+                                                nuevoTurno.presente = turno.presente;
+                                                nuevoTurno.atendido = turno.atendido;
+                                                nuevoTurno.hora_llegada = turno.hora_llegada;
+                                                nuevoTurno.costo = turno.costo;
+                                                nuevoTurno.costo2 = turno.costo2;
+                                                nuevoTurno.costo3 = turno.costo3;
+                                                nuevoTurno.usuario = turno.usuario;
+                                                nuevoTurno.id_medico = turno.id_medico;
+                                                pacientesListos++;
+                                                resultadoPacientes.push(nuevoTurno);
+                                                if (pacientesListos === pacientes.length) {
+                                                    resultadoPacientes.sort(ordenarTurnos);
+                                                    res.json({resultado: true, datos: resultadoPacientes})
+                                                }
+                                            })
+                                            .catch(function(err){
+                                                console.log(err);
+                                                res.status(500).json({resultado: false, mensaje: err})
+                                            })
+                                    }
+                                }
+                                else {
+                                    res.json({resultado: true, datos:{}})
+                                }
+                            })
+                            .catch(function(err){
+                                console.log(err);
+                                res.status(500).json({resultado: false, mensaje: err})
+                            })
+                    }
+                    else {
+                        console.log("Agenda sin todos los datos necesarios");
+                        res.status(400).json({resultado: false, mensaje: "Faltan parámetros para ver los turnos"})
+                    }
+                }
+            });
+        } else {
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
+
+    function ordenarTurnos(a, b) {
+        if (a.id_turno < b.id_turno) {
+            return -1;
+        }
+        if (a.id_turno > b.id_turno) {
+            return 1;
+        }
+        return 0;
+    }
+
+    function turnosPorPaciente(req, res) {
+        var token = req.headers['x-access-token'];
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+                if (err) {
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({
+                        resultado: false,
+                        mensaje: "Error de autenticación"
+                    });
+                } else {
+                    if (req.params.paciente) {
+                        //TODO
+                        res.status(500).json({resultado: false, mensaje: "No implementado"})
+                    }
+                    else{
+                        res.status(400).json({resultado: false, mensaje: "Debe especificar un ID de paciente"})
+                    }
+                }
+            });
+        } else {
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
 
     function modificarCosto(req,res) {
         var token = req.headers['x-access-token'];
