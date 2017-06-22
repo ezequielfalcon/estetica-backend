@@ -118,8 +118,7 @@ app.post('/api/agregar-tratamiento', turnos.nuevoTratamientoTurno);
 app.post('/api/turno-presente', turnos.agendaPresente);
 app.put('/api/agenda/modificar-costo/:id', turnos.modificarCosto);
 //nueva query para listados
-app.get('/api/listado-turnos/:fecha/:medico', turnos.verTurnosListado);
-app.get('/api/listado-turnos2/:fecha/:medico', turnos.verTurnosListadoNew);
+app.get('/api/listado-turnos/:fecha/:medico', turnos.verTurnosListadoNew);
 //turnos por paciente
 app.get('/api/turnos-paciente/:paciente');
 
