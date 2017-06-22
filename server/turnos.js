@@ -33,7 +33,8 @@ module.exports = function(db, pgp) {
                     });
                 } else {
                     if (req.params.fecha && req.params.medico){
-                        db.manyOrNone("select DISTINCT ON (agenda.id_paciente) id_paciente, CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente " +
+                        db.manyOrNone("select DISTINCT ON (agenda.id_paciente) id_paciente, " +
+                            "CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente, CONCAT(pacientes.telefono, ' | ', pacientes.celular) telefono " +
                             "from agenda " +
                             "inner join pacientes on agenda.id_paciente = pacientes.id " +
                             "where fecha = $1 and id_medico = $2;"
@@ -61,6 +62,7 @@ module.exports = function(db, pgp) {
                                                 nuevoTurno.costo2 = turno.costo2;
                                                 nuevoTurno.costo3 = turno.costo3;
                                                 nuevoTurno.usuario = turno.usuario;
+                                                nuevoTurno.telefono = paciente.telefono;
                                                 pacientesListos++;
                                                 resultadoPacientes.push(nuevoTurno);
                                                 if (pacientesListos === pacientes.length) {
@@ -84,7 +86,8 @@ module.exports = function(db, pgp) {
                             })
                     }
                     else if (req.params.fecha) {
-                        db.manyOrNone("select DISTINCT ON (agenda.id_paciente) id_paciente, CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente " +
+                        db.manyOrNone("select DISTINCT ON (agenda.id_paciente) id_paciente, " +
+                            "CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente, CONCAT(pacientes.telefono, ' | ', pacientes.celular) telefono " +
                             "from agenda " +
                             "inner join pacientes on agenda.id_paciente = pacientes.id " +
                             "where fecha = $1;"
@@ -113,6 +116,7 @@ module.exports = function(db, pgp) {
                                                 nuevoTurno.costo3 = turno.costo3;
                                                 nuevoTurno.usuario = turno.usuario;
                                                 nuevoTurno.id_medico = turno.id_medico;
+                                                nuevoTurno.telefono = paciente.telefono;
                                                 pacientesListos++;
                                                 resultadoPacientes.push(nuevoTurno);
                                                 if (pacientesListos === pacientes.length) {
