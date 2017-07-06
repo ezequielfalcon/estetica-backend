@@ -183,8 +183,9 @@ module.exports = function(db, pgp) {
                                     let diasListos = 0;
                                     for (let dia of dias) {
                                         let nuevoTurno = {};
+                                        var diaTexto = dia.toString();
                                         db.oneOrNone('SELECT * FROM agenda WHERE id_paciente = $1 AND agenda.fecha = $2 ORDER BY id_turno ASC, entreturno ASC LIMIT 1;'
-                                        , [req.params.paciente, dia.substr(0,10)])
+                                        , [req.params.paciente, diaTexto.substr(0,10)])
                                             .then(turno => {
                                                 if (turno) {
                                                     nuevoTurno.id = turno.id;
