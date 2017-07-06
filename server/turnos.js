@@ -164,7 +164,7 @@ module.exports = function(db, pgp) {
     }
 
     function turnosPorPaciente(req, res) {
-        var token = req.headers['x-access-token'];
+        let token = req.headers['x-access-token'];
         if (token) {
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
                 if (err) {
@@ -176,7 +176,52 @@ module.exports = function(db, pgp) {
                 } else {
                     if (req.params.paciente) {
                         //TODO
-                        res.status(500).json({resultado: false, mensaje: "No implementado"})
+                        db.manyOrNone('select distinct fecha from agenda where id_paciente = $1 ORDER BY fecha DESC;', req.params.paciente)
+                            .then(dias => {
+                                if (dias) {
+                                    let resultadoDias = [];
+                                    let diasListos = 0;
+                                    for (let dia of dias) {
+                                        let nuevoTurno = {};
+                                        db.oneOrNone('SELECT * FROM agenda WHERE id_paciente = $1 AND agenda.fecha = $2 ORDER BY id_turno ASC, entreturno ASC LIMIT 1;'
+                                        , req.params.paciente, dia)
+                                            .then(turno => {
+                                                if (turno) {
+                                                    nuevoTurno.id = turno.id;
+                                                    nuevoTurno.id = turno.id;
+                                                    nuevoTurno.telefono = turno.telefono;
+                                                    nuevoTurno.id_consultorio = turno.id_consultorio;
+                                                    nuevoTurno.id_turno = turno.id_turno;
+                                                    nuevoTurno.entreturno = turno.entreturno;
+                                                    nuevoTurno.presente = turno.presente;
+                                                    nuevoTurno.atendido = turno.atendido;
+                                                    nuevoTurno.hora_llegada = turno.hora_llegada;
+                                                    nuevoTurno.costo = turno.costo;
+                                                    nuevoTurno.costo2 = turno.costo2;
+                                                    nuevoTurno.costo3 = turno.costo3;
+                                                    nuevoTurno.usuario = turno.usuario;
+                                                    nuevoTurno.id_medico = turno.id_medico;
+                                                    resultadoDias.push(nuevoTurno);
+                                                    diasListos++;
+                                                    if (diasListos === dias.length) {
+                                                        res.json({resultado: true, datos: resultadoDias})
+                                                    }
+                                                }
+                                            })
+                                            .catch(err => {
+                                                console.log(err);
+                                                res.status(500).json({resultado: false, mensaje: err})
+                                            })
+                                    }
+                                }
+                                else{
+                                    res.json({resultado: true, datos: {}})
+                                }
+                            })
+                            .catch(err => {
+                                console.log(err);
+                                res.status(500).json({resultado: false, mensaje: err})
+                            })
                     }
                     else{
                         res.status(400).json({resultado: false, mensaje: "Debe especificar un ID de paciente"})
