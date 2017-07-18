@@ -183,6 +183,7 @@ module.exports = function(db, pgp) {
                                     let diasListos = 0;
                                     for (let dia of dias) {
                                         let nuevoTurno = {};
+                                        console.log(dia.fecha);
                                         db.oneOrNone('SELECT * FROM agenda WHERE id_paciente = $1 AND agenda.fecha = $2 ORDER BY id_turno ASC, entreturno ASC LIMIT 1;'
                                         , [req.params.paciente, dia.fecha])
                                             .then(turno => {
