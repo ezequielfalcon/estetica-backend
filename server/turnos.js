@@ -653,7 +653,7 @@ module.exports = function(db, pgp) {
                     });
                 } else {
                     if (req.params.id){
-                        db.manyOrNone("SELECT agenda.id, agenda.fecha, agenda.id_medico, CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente, CONCAT(pacientes.telefono, ' | ', pacientes.celular) telefono, agenda.id_consultorio, agenda.id_turno, agenda.entreturno, agenda.presente, agenda.atendido, agenda.hora_llegada, agenda.costo, agenda.costo2, agenda.costo3 FROM agenda INNER JOIN medicos on agenda.id_medico = medicos.id INNER JOIN pacientes ON agenda.id_paciente = pacientes.id WHERE agenda.id = $1;", req.params.id)
+                        db.manyOrNone("SELECT agenda.id, agenda.fecha, agenda.id_paciente, agenda.id_medico, CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente, CONCAT(pacientes.telefono, ' | ', pacientes.celular) telefono, agenda.id_consultorio, agenda.id_turno, agenda.entreturno, agenda.presente, agenda.atendido, agenda.hora_llegada, agenda.costo, agenda.costo2, agenda.costo3 FROM agenda INNER JOIN medicos on agenda.id_medico = medicos.id INNER JOIN pacientes ON agenda.id_paciente = pacientes.id WHERE agenda.id = $1;", req.params.id)
                             .then(function(data) {
                                 res.json({
                                     resultado: true,
