@@ -175,7 +175,6 @@ module.exports = function(db, pgp) {
                     });
                 } else {
                     if (req.params.paciente) {
-                        //TODO
                         db.manyOrNone('select distinct fecha from agenda where id_paciente = $1 ORDER BY fecha DESC;', req.params.paciente)
                             .then(dias => {
                                 if (dias) {
@@ -183,7 +182,6 @@ module.exports = function(db, pgp) {
                                     let diasListos = 0;
                                     for (let dia of dias) {
                                         let nuevoTurno = {};
-                                        console.log(dia.fecha);
                                         db.oneOrNone('SELECT * FROM agenda WHERE id_paciente = $1 AND agenda.fecha = $2 ORDER BY id_turno ASC, entreturno ASC LIMIT 1;'
                                         , [req.params.paciente, dia.fecha])
                                             .then(turno => {
@@ -202,6 +200,7 @@ module.exports = function(db, pgp) {
                                                     nuevoTurno.costo3 = turno.costo3;
                                                     nuevoTurno.usuario = turno.usuario;
                                                     nuevoTurno.id_medico = turno.id_medico;
+                                                    nuevoTurno.fecha = turno.fecha;
                                                     resultadoDias.push(nuevoTurno);
                                                     diasListos++;
                                                     if (diasListos === dias.length) {
