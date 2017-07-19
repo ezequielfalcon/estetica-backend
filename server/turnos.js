@@ -175,7 +175,6 @@ module.exports = function(db, pgp) {
                     });
                 } else {
                     if (req.params.paciente) {
-                        //TODO
                         db.manyOrNone('select distinct fecha from agenda where id_paciente = $1 ORDER BY fecha DESC;', req.params.paciente)
                             .then(dias => {
                                 if (dias) {
@@ -201,6 +200,7 @@ module.exports = function(db, pgp) {
                                                     nuevoTurno.costo3 = turno.costo3;
                                                     nuevoTurno.usuario = turno.usuario;
                                                     nuevoTurno.id_medico = turno.id_medico;
+                                                    nuevoTurno.fecha = turno.fecha;
                                                     resultadoDias.push(nuevoTurno);
                                                     diasListos++;
                                                     if (diasListos === dias.length) {
