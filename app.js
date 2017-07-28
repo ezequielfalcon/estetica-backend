@@ -142,12 +142,12 @@ app.get('/api', function(req, res) {
     })
 });
 
-const server = app.listen(app.get('port'), function () {
+const server = app.listen(app.get('port'), function() {
     console.log('Backend escuchando en puerto ', app.get('port'));
 });
 
 const jsreport = require('jsreport')({
-    express: {app: reportingApp, server: server},
+    express: { app: reportingApp, server: server },
     appPath: "/reportes",
     connectionString: {
         name: "mongodb",
@@ -166,6 +166,6 @@ const jsreport = require('jsreport')({
 });
 jsreport.use(require('jsreport-authentication')({}));
 
-jsreport.init().catch(function (e) {
+jsreport.init().catch(function(e) {
     console.error(e);
 });

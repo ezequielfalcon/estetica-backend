@@ -3,7 +3,7 @@
  */
 const jwt = require('jsonwebtoken');
 
-module.exports = function(db, pgp){
+module.exports = function(db, pgp) {
     let module = {};
     const qrm = pgp.queryResult;
 
@@ -12,51 +12,44 @@ module.exports = function(db, pgp){
     module.traer = traer;
     module.modificar = modificar;
 
-    function modificar(req, res){
+    function modificar(req, res) {
         const token = req.headers['x-access-token'];
-        if (token){
-            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
-                if (err){
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+                if (err) {
                     console.log("Error de autenticación, token inválido!\n" + err);
-                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
-                }
-                else{
-                    if (decoded.rol === "admin"){
-                        if (req.params.id && req.body.nombre ){
+                    res.status(401).json({ resultado: false, mensaje: "Error de autenticación" });
+                } else {
+                    if (decoded.rol === "admin") {
+                        if (req.params.id && req.body.nombre) {
                             db.func("consultorios_modificar", [req.params.id, req.body.nombre], qrm.one)
-                                .then(function(data){
-                                    if (data.consultorios_modificar === 'error-consultorio'){
-                                        res.status(404).json({resultado: false, mensaje: "No se encuentra el Consultorio"});
-                                    }
-                                    else if(data.consultorios_modificar === 'error-nombre'){
-                                        res.status(400).json({resultado: false, mensaje: "Ya existe un Consultorio con ese nombre"})
-                                    }
-                                    else if (data.consultorios_modificar === 'ok'){
-                                        res.json({resultado: true, mensaje: "Consultorio modificado"})
-                                    }
-                                    else{
+                                .then(function(data) {
+                                    if (data.consultorios_modificar === 'error-consultorio') {
+                                        res.status(404).json({ resultado: false, mensaje: "No se encuentra el Consultorio" });
+                                    } else if (data.consultorios_modificar === 'error-nombre') {
+                                        res.status(400).json({ resultado: false, mensaje: "Ya existe un Consultorio con ese nombre" })
+                                    } else if (data.consultorios_modificar === 'ok') {
+                                        res.json({ resultado: true, mensaje: "Consultorio modificado" })
+                                    } else {
                                         console.log("Error en consultorios_modificar: " + data);
-                                        res.status(500).json({resultado: false, mensaje: "error interno"});
+                                        res.status(500).json({ resultado: false, mensaje: "error interno" });
                                     }
                                 })
-                                .catch(function(err){
+                                .catch(function(err) {
                                     console.log(err);
-                                    res.status(500).json({resultado: false, mensaje: err})
+                                    res.status(500).json({ resultado: false, mensaje: err })
                                 })
-                        }
-                        else{
+                        } else {
                             console.log("Consultorio POST sin todos los datos necesarios");
-                            res.status(400).json({resultado: false, mensaje: "Faltan datos para la petición"})
+                            res.status(400).json({ resultado: false, mensaje: "Faltan datos para la petición" })
                         }
-                    }
-                    else{
+                    } else {
                         console.log("Usuario " + decoded.nombre + " no autorizado");
-                        res.status(403).json({resultado: false, mensaje:"no tiene permiso para modificar Consultorios!"});
+                        res.status(403).json({ resultado: false, mensaje: "no tiene permiso para modificar Consultorios!" });
                     }
                 }
             });
-        }
-        else{
+        } else {
             res.status(401).json({
                 resultado: false,
                 mensaje: 'No token provided.'
@@ -64,44 +57,40 @@ module.exports = function(db, pgp){
         }
     }
 
-    function traer(req,res){
+    function traer(req, res) {
         const token = req.headers['x-access-token'];
-        if (token){
-            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
-                if (err){
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+                if (err) {
                     console.log("Error de autenticación, token inválido!\n" + err);
-                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
-                }
-                else{
-                    if (req.params.id){
+                    res.status(401).json({ resultado: false, mensaje: "Error de autenticación" });
+                } else {
+                    if (req.params.id) {
                         db.oneOrNone("SELECT * FROM consultorios WHERE id = $1;", req.params.id)
-                            .then(function(data){
-                                if (data){
-                                    res.json({resultado: true, datos: data})
-                                }
-                                else {
-                                    res.status(404).json({resultado: false, mensaje: "No se encuentra el Consultorio"})
+                            .then(function(data) {
+                                if (data) {
+                                    res.json({ resultado: true, datos: data })
+                                } else {
+                                    res.status(404).json({ resultado: false, mensaje: "No se encuentra el Consultorio" })
                                 }
                             })
-                            .catch(function(err){
+                            .catch(function(err) {
                                 console.log(err);
-                                res.status(500).json({resultado: false, mensaje: err})
+                                res.status(500).json({ resultado: false, mensaje: err })
                             })
-                    }
-                    else{
+                    } else {
                         db.manyOrNone("SELECT * FROM consultorios ORDER BY id;")
-                            .then(function (data){
-                                res.json({resultado: true, datos: data})
+                            .then(function(data) {
+                                res.json({ resultado: true, datos: data })
                             })
-                            .catch(function(err){
+                            .catch(function(err) {
                                 console.log(err);
-                                res.status(500).json({resultado: false, mensaje: err})
+                                res.status(500).json({ resultado: false, mensaje: err })
                             })
                     }
                 }
             });
-        }
-        else{
+        } else {
             res.status(401).json({
                 resultado: false,
                 mensaje: 'No token provided.'
@@ -109,45 +98,40 @@ module.exports = function(db, pgp){
         }
     }
 
-    function crear(req, res){
+    function crear(req, res) {
         const token = req.headers['x-access-token'];
-        if (token){
-            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
-                if (err){
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+                if (err) {
                     console.log("Error de autenticación, token inválido!\n" + err);
-                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
-                }
-                else{
+                    res.status(401).json({ resultado: false, mensaje: "Error de autenticación" });
+                } else {
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    if (decoded.rol === "admin"){
-                        if (req.body.id && req.body.nombre){
+                    if (decoded.rol === "admin") {
+                        if (req.body.id && req.body.nombre) {
                             db.func("consultorios_crear", [req.body.id, req.body.nombre], qrm.one)
-                                .then(function(data){
-                                    if (data.consultorios_crear === 'error-consultorio'){
-                                        res.status(400).json({resultado: false, mensaje: "Ya existe un Consultorio con ese nombre o ID"})
-                                    }
-                                    else {
-                                        res.json({resultado: true, mensaje: "Consultorio creado", id: data.consultorios_crear})
+                                .then(function(data) {
+                                    if (data.consultorios_crear === 'error-consultorio') {
+                                        res.status(400).json({ resultado: false, mensaje: "Ya existe un Consultorio con ese nombre o ID" })
+                                    } else {
+                                        res.json({ resultado: true, mensaje: "Consultorio creado", id: data.consultorios_crear })
                                     }
                                 })
-                                .catch(function(err){
+                                .catch(function(err) {
                                     console.log(err);
-                                    res.status(500).json({resultado: false, mensaje: err})
+                                    res.status(500).json({ resultado: false, mensaje: err })
                                 })
-                        }
-                        else{
+                        } else {
                             console.log("Consultorio sin todos los datos necesarios");
-                            res.status(400).json({resultado: false, mensaje: "Faltan datos para crear el Consultorio"})
+                            res.status(400).json({ resultado: false, mensaje: "Faltan datos para crear el Consultorio" })
                         }
-                    }
-                    else{
+                    } else {
                         console.log("Usuario " + decoded.nombre + " no autorizado");
-                        res.status(403).json({resultado: false, mensaje:"No tiene permiso para crear Consultorios!"});
+                        res.status(403).json({ resultado: false, mensaje: "No tiene permiso para crear Consultorios!" });
                     }
                 }
             });
-        }
-        else{
+        } else {
             res.status(401).json({
                 resultado: false,
                 mensaje: 'No token provided.'
@@ -155,49 +139,43 @@ module.exports = function(db, pgp){
         }
     }
 
-    function borrar(req, res){
+    function borrar(req, res) {
         const token = req.headers['x-access-token'];
-        if (token){
-            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
-                if (err){
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+                if (err) {
                     console.log("Error de autenticación, token inválido!\n" + err);
-                    res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
-                }
-                else{
+                    res.status(401).json({ resultado: false, mensaje: "Error de autenticación" });
+                } else {
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    if (decoded.rol === "admin"){
-                        if (req.params.id){
+                    if (decoded.rol === "admin") {
+                        if (req.params.id) {
                             db.func("consultorios_borrar", req.params.id, qrm.one)
-                                .then(function(data){
-                                    if (data.consultorios_borrar === 'error-consultorio'){
-                                        res.status(404).json({resultado: false, mensaje: "No se encuentra el Consultorio"})
-                                    }
-                                    else if (data.consultorios_borrar === 'ok') {
-                                        res.json({resultado: true, mensaje: "Consultorio borrado"})
-                                    }
-                                    else{
+                                .then(function(data) {
+                                    if (data.consultorios_borrar === 'error-consultorio') {
+                                        res.status(404).json({ resultado: false, mensaje: "No se encuentra el Consultorio" })
+                                    } else if (data.consultorios_borrar === 'ok') {
+                                        res.json({ resultado: true, mensaje: "Consultorio borrado" })
+                                    } else {
                                         console.log("Error en consultorios_borrar: " + data.consultorios_borrar);
-                                        res.status(500).json({resultado: false, mensaje: "Error no especificado:" + data.consultorios_borrar})
+                                        res.status(500).json({ resultado: false, mensaje: "Error no especificado:" + data.consultorios_borrar })
                                     }
                                 })
-                                .catch(function(err){
+                                .catch(function(err) {
                                     console.log(err);
-                                    res.status(500).json({resultado: false, mensaje: err})
+                                    res.status(500).json({ resultado: false, mensaje: err })
                                 })
-                        }
-                        else{
+                        } else {
                             console.log("Consultorio DELETE sin todos los datos necesarios");
-                            res.status(400).json({resultado: false, mensaje: "Faltan datos"})
+                            res.status(400).json({ resultado: false, mensaje: "Faltan datos" })
                         }
-                    }
-                    else{
+                    } else {
                         console.log("Usuario " + decoded.nombre + " no autorizado");
-                        res.status(403).json({resultado: false, mensaje:"No tiene permiso para borrar Consultorios!"});
+                        res.status(403).json({ resultado: false, mensaje: "No tiene permiso para borrar Consultorios!" });
                     }
                 }
             });
-        }
-        else{
+        } else {
             res.status(401).json({
                 resultado: false,
                 mensaje: 'No token provided.'
