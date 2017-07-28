@@ -128,7 +128,8 @@ module.exports = function(db, pgp) {
                                     res.status(500).json({ resultado: false, mensaje: err })
                                 })
                         } else {
-                            console.log("Paciente POST sin todos los datos necesarios");
+                            console.error("Paciente POST sin todos los datos necesarios");
+                            console.log(req.body);
                             res.status(400).json({ resultado: false, mensaje: "Faltan datos en el POST" })
                         }
                     } else {
