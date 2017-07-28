@@ -1,12 +1,12 @@
 /**
  * Created by falco on 30/1/2017.
  */
-var jwt = require('jsonwebtoken');
-var bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 module.exports = function(db, pgp){
-    var module = {};
-    var qrm = pgp.queryResult;
+    let module = {};
+    const qrm = pgp.queryResult;
 
     module.crear = crear;
     module.borrar = borrar;
@@ -17,7 +17,7 @@ module.exports = function(db, pgp){
     module.borrarAnulacion = borrarAnulacion;
 
     function borrarAnulacion(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -56,7 +56,7 @@ module.exports = function(db, pgp){
     }
 
     function verAnulaciones(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -96,7 +96,7 @@ module.exports = function(db, pgp){
     }
 
     function nuevaAnulacion(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -160,7 +160,7 @@ module.exports = function(db, pgp){
     }
 
     function modificar(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -212,7 +212,7 @@ module.exports = function(db, pgp){
     }
 
     function traer(req,res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -257,7 +257,7 @@ module.exports = function(db, pgp){
     }
 
     function crear(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -268,7 +268,7 @@ module.exports = function(db, pgp){
                     console.log("Usuario " + decoded.nombre + " autorizado");
                     if (decoded.rol === "admin"){
                         if (req.body.nombre && req.body.apellido && req.body.mail && req.body.usuario && req.body.clave){
-                            var hash = bcrypt.hashSync(req.body.clave, 10);
+                            const hash = bcrypt.hashSync(req.body.clave, 10);
                             db.func("medico_crear_v2", [req.body.nombre, req.body.apellido, req.body.mail, req.body.usuario, hash], qrm.one)
                                 .then(function(data){
                                     if (data.medico_crear_v2 === 'error-mail'){
@@ -310,7 +310,7 @@ module.exports = function(db, pgp){
     }
 
     function borrar(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -319,14 +319,14 @@ module.exports = function(db, pgp){
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    if (decoded.rol == "admin"){
+                    if (decoded.rol === "admin"){
                         if (req.params.id){
                             db.func("medico_borrar", req.params.id, qrm.one)
                                 .then(function(data){
-                                    if (data.medico_borrar == 'error-medico'){
+                                    if (data.medico_borrar === 'error-medico'){
                                         res.status(404).json({resultado: false, mensaje: "No se encuentra el Médico"})
                                     }
-                                    else if (data.medico_borrar == 'ok') {
+                                    else if (data.medico_borrar === 'ok') {
                                         res.json({resultado: true, mensaje: "Médico borrado"})
                                     }
                                     else{
@@ -336,7 +336,7 @@ module.exports = function(db, pgp){
                                 })
                                 .catch(function(err){
                                     console.log(err);
-                                    if (err.code == '23503'){
+                                    if (err.code === '23503'){
                                         res.status(400).json({resultado: false, mensaje: "El médico tiene datos relacionados, no se puede borrar!"});
                                     }
                                     else{

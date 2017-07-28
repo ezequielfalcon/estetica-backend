@@ -1,11 +1,11 @@
 /**
  * Created by eze on 19/01/17.
  */
-var jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 module.exports = function(db, pgp){
-    var module = {};
-    var qrm = pgp.queryResult;
+    let module = {};
+    const qrm = pgp.queryResult;
 
     module.crear = crear;
     module.borrar = borrar;
@@ -13,7 +13,7 @@ module.exports = function(db, pgp){
     module.modificar = modificar;
 
     function modificar(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -22,17 +22,17 @@ module.exports = function(db, pgp){
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    if (decoded.rol == "admin"){
+                    if (decoded.rol === "admin"){
                         if (req.params.id && req.body.nombre){
                             db.func("rol_modificar", [req.params.id, req.body.nombre], qrm.one)
                                 .then(function(data){
-                                    if (data.rol_modificar == 'error-rol'){
+                                    if (data.rol_modificar === 'error-rol'){
                                         res.status(404).json({resultado: false, mensaje: "no se encuentra el rol"})
                                     }
-                                    else if(data.rol_modificar == 'error-existe'){
+                                    else if(data.rol_modificar === 'error-existe'){
                                         res.status(400).json({resultado: false, mensaje: "ya existe un rol con ese nombre"})
                                     }
-                                    else if (data.rol_modificar == 'ok'){
+                                    else if (data.rol_modificar === 'ok'){
                                         res.json({resultado: true, mensaje: "Rol modificado"})
                                     }
                                     else{
@@ -66,7 +66,7 @@ module.exports = function(db, pgp){
     }
 
     function traer(req,res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -112,7 +112,7 @@ module.exports = function(db, pgp){
     }
 
     function crear(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -121,11 +121,11 @@ module.exports = function(db, pgp){
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    if (decoded.rol == "admin"){
+                    if (decoded.rol === "admin"){
                         if (req.body.nombre){
                             db.func("rol_crear", req.body.nombre, qrm.one)
                                 .then(function(data){
-                                    if (data.rol_crear == 'error-rol'){
+                                    if (data.rol_crear === 'error-rol'){
                                         res.status(400).json({resultado: false, mensaje: "ya existe un rol con ese nombre"})
                                     }
                                     else {
@@ -158,7 +158,7 @@ module.exports = function(db, pgp){
     }
 
     function borrar(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -167,17 +167,17 @@ module.exports = function(db, pgp){
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    if (decoded.rol == "admin"){
+                    if (decoded.rol === "admin"){
                         if (req.params.id){
                             db.func("rol_borrar", req.params.id, qrm.one)
                                 .then(function(data){
-                                    if (data.rol_borrar == 'error-rol'){
+                                    if (data.rol_borrar === 'error-rol'){
                                         res.status(400).json({resultado: false, mensaje: "no existe un rol con ese nombre"})
                                     }
-                                    else if(data.rol_borrar == 'error-usuarios'){
+                                    else if(data.rol_borrar === 'error-usuarios'){
                                         res.status(400).json({resultado: false, mensaje: "El rol está siendo usado por algún usuario"})
                                     }
-                                    else if (data.rol_borrar == 'ok') {
+                                    else if (data.rol_borrar === 'ok') {
                                         res.json({resultado: true, mensaje: "Rol borrado"})
                                     }
                                     else{

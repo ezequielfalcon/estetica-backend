@@ -1,11 +1,11 @@
 /**
  * Created by eze on 08/02/17.
  */
-var jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 module.exports = function(db, pgp){
-    var module = {};
-    var qrm = pgp.queryResult;
+    let module = {};
+    const qrm = pgp.queryResult;
 
     module.crear = crear;
     module.borrar = borrar;
@@ -13,7 +13,7 @@ module.exports = function(db, pgp){
     module.modificar = modificar;
 
     function modificar(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -21,17 +21,17 @@ module.exports = function(db, pgp){
                     res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
-                    if (decoded.rol == "admin"){
+                    if (decoded.rol === "admin"){
                         if (req.params.id && req.body.nombre ){
                             db.func("consultorios_modificar", [req.params.id, req.body.nombre], qrm.one)
                                 .then(function(data){
-                                    if (data.consultorios_modificar == 'error-consultorio'){
+                                    if (data.consultorios_modificar === 'error-consultorio'){
                                         res.status(404).json({resultado: false, mensaje: "No se encuentra el Consultorio"});
                                     }
-                                    else if(data.consultorios_modificar == 'error-nombre'){
+                                    else if(data.consultorios_modificar === 'error-nombre'){
                                         res.status(400).json({resultado: false, mensaje: "Ya existe un Consultorio con ese nombre"})
                                     }
-                                    else if (data.consultorios_modificar == 'ok'){
+                                    else if (data.consultorios_modificar === 'ok'){
                                         res.json({resultado: true, mensaje: "Consultorio modificado"})
                                     }
                                     else{
@@ -65,7 +65,7 @@ module.exports = function(db, pgp){
     }
 
     function traer(req,res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -110,7 +110,7 @@ module.exports = function(db, pgp){
     }
 
     function crear(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -119,11 +119,11 @@ module.exports = function(db, pgp){
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    if (decoded.rol == "admin"){
+                    if (decoded.rol === "admin"){
                         if (req.body.id && req.body.nombre){
                             db.func("consultorios_crear", [req.body.id, req.body.nombre], qrm.one)
                                 .then(function(data){
-                                    if (data.consultorios_crear == 'error-consultorio'){
+                                    if (data.consultorios_crear === 'error-consultorio'){
                                         res.status(400).json({resultado: false, mensaje: "Ya existe un Consultorio con ese nombre o ID"})
                                     }
                                     else {
@@ -156,7 +156,7 @@ module.exports = function(db, pgp){
     }
 
     function borrar(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -165,14 +165,14 @@ module.exports = function(db, pgp){
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    if (decoded.rol == "admin"){
+                    if (decoded.rol === "admin"){
                         if (req.params.id){
                             db.func("consultorios_borrar", req.params.id, qrm.one)
                                 .then(function(data){
-                                    if (data.consultorios_borrar == 'error-consultorio'){
+                                    if (data.consultorios_borrar === 'error-consultorio'){
                                         res.status(404).json({resultado: false, mensaje: "No se encuentra el Consultorio"})
                                     }
-                                    else if (data.consultorios_borrar == 'ok') {
+                                    else if (data.consultorios_borrar === 'ok') {
                                         res.json({resultado: true, mensaje: "Consultorio borrado"})
                                     }
                                     else{

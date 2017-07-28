@@ -1,11 +1,11 @@
 /**
  * Created by eze on 20/02/17.
  */
-var jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 module.exports = function(db, pgp){
-    var module = {};
-    var qrm = pgp.queryResult;
+    let module = {};
+    const qrm = pgp.queryResult;
 
     module.crear = crear;
     module.borrar = borrar;
@@ -14,7 +14,7 @@ module.exports = function(db, pgp){
     module.traerAgenda = traerAgenda;
 
     function traerAgenda(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -49,7 +49,7 @@ module.exports = function(db, pgp){
     }
 
     function modificar(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -57,17 +57,18 @@ module.exports = function(db, pgp){
                     res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
-                    if (decoded.rol == "admin"){
-                        if (req.params.id && req.body.nombre && req.body.costo){
-                            db.func("tratamientos_modificar", [req.params.id, req.body.nombre, req.body.costo], qrm.one)
+                    if (decoded.rol === "admin"){
+                        if (req.params.id && req.body.nombre){
+                            const costo = req.body.costo || 0;
+                            db.func("tratamientos_modificar", [req.params.id, req.body.nombre, costo], qrm.one)
                                 .then(function(data){
-                                    if (data.tratamientos_modificar == 'error-tratamiento'){
+                                    if (data.tratamientos_modificar === 'error-tratamiento'){
                                         res.status(404).json({resultado: false, mensaje: "No se encuentra el Tratamiento"});
                                     }
-                                    else if(data.tratamientos_modificar == 'error-nombre'){
+                                    else if(data.tratamientos_modificar === 'error-nombre'){
                                         res.status(400).json({resultado: false, mensaje: "Ya existe un Tratamiento con ese nombre"})
                                     }
-                                    else if (data.tratamientos_modificar == 'ok'){
+                                    else if (data.tratamientos_modificar === 'ok'){
                                         res.json({resultado: true, mensaje: "Tratamiento modificado"})
                                     }
                                     else{
@@ -101,7 +102,7 @@ module.exports = function(db, pgp){
     }
 
     function traer(req,res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -146,7 +147,7 @@ module.exports = function(db, pgp){
     }
 
     function crear(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -155,11 +156,12 @@ module.exports = function(db, pgp){
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    if (decoded.rol == "admin"){
-                        if (req.body.nombre && req.body.costo){
-                            db.func("tratamientos_crear", [req.body.nombre, req.body.costo], qrm.one)
+                    if (decoded.rol === "admin"){
+                        if (req.body.nombre){
+                            const costo = req.body.costo || 0;
+                            db.func("tratamientos_crear", [req.body.nombre, costo], qrm.one)
                                 .then(function(data){
-                                    if (data.tratamientos_crear == 'error-nombre'){
+                                    if (data.tratamientos_crear === 'error-nombre'){
                                         res.status(400).json({resultado: false, mensaje: "Ya existe un Tratamiento con ese nombre"})
                                     }
                                     else {
@@ -192,7 +194,7 @@ module.exports = function(db, pgp){
     }
 
     function borrar(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -201,14 +203,14 @@ module.exports = function(db, pgp){
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    if (decoded.rol == "admin"){
+                    if (decoded.rol === "admin"){
                         if (req.params.id){
                             db.func("tratamientos_borrar", req.params.id, qrm.one)
                                 .then(function(data){
-                                    if (data.tratamientos_borrar == 'error-tratamiento'){
+                                    if (data.tratamientos_borrar === 'error-tratamiento'){
                                         res.status(404).json({resultado: false, mensaje: "No se encuentra el Tratamiento"})
                                     }
-                                    else if (data.tratamientos_borrar == 'ok') {
+                                    else if (data.tratamientos_borrar === 'ok') {
                                         res.json({resultado: true, mensaje: "Tratamiento borrado"})
                                     }
                                     else{
@@ -218,7 +220,7 @@ module.exports = function(db, pgp){
                                 })
                                 .catch(function(err){
                                     console.log(err);
-                                    if (err.code == '23503'){
+                                    if (err.code === '23503'){
                                         res.status(400).json({resultado: false, mensaje: "El tratamiento tiene datos relacionados, no se puede borrar!"});
                                     }
                                     else{
