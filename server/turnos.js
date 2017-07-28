@@ -76,11 +76,11 @@ module.exports = function(db, pgp) {
 
                                         }
                                     } else {
-                                        res.json({ resultado: true, datos: {} })
+                                        res.json({ resultado: true, datos: [] })
                                     }
 
                                 } else {
-                                    res.json({ resultado: true, datos: {} })
+                                    res.json({ resultado: true, datos: [] })
                                 }
                             })
                             .catch(function(err) {
