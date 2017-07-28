@@ -1,6 +1,7 @@
 let express = require('express');
 let app = express();
 let bodyParser = require('body-parser');
+const fileUpload = require('express-fileupload');
 const pgp = require("pg-promise")();
 
 const cn = {
@@ -38,6 +39,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+app.use(fileUpload());
 app.set('port', (process.env.PORT || 5000));
 
 
