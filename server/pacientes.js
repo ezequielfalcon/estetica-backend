@@ -1,11 +1,11 @@
 /**
  * Created by falco on 27/1/2017.
  */
-var jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 module.exports = function(db, pgp){
-    var module = {};
-    var qrm = pgp.queryResult;
+    let module = {};
+    const qrm = pgp.queryResult;
 
     module.crear = crear;
     module.borrar = borrar;
@@ -14,7 +14,7 @@ module.exports = function(db, pgp){
     module.buscar = buscar;
 
     function buscar(req,res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -23,9 +23,9 @@ module.exports = function(db, pgp){
                 }
                 else{
                     if (decoded.rol === 'usuario' || decoded.rol === 'admin' || decoded.rol === 'medico'){
-                        var nom = req.body.nombre + '%' || '%';
-                        var ape = req.body.apellido + '%' || '%';
-                        var dni = req.body.documento + '%' || '%';
+                        const nom = req.body.nombre + '%' || '%';
+                        const ape = req.body.apellido + '%' || '%';
+                        const dni = req.body.documento + '%' || '%';
                         db.manyOrNone("select * from pacientes where nombre ILIKE $1 AND apellido ILIKE $2 AND documento ILIKE $3 ORDER BY UPPER(apellido) ASC, UPPER(nombre) ASC LIMIT 50;",
                             [nom, ape, dni])
                             .then(function(data){
@@ -51,7 +51,7 @@ module.exports = function(db, pgp){
     }
 
     function traer(req,res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -101,7 +101,7 @@ module.exports = function(db, pgp){
     }
 
     function crear(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -110,7 +110,7 @@ module.exports = function(db, pgp){
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    if (decoded.rol == 'usuario' || decoded.rol == 'admin'){
+                    if (decoded.rol === 'usuario' || decoded.rol === 'admin'){
                         if (req.body.nombre && req.body.apellido && req.body.documento
                             && req.body.fecha && req.body.telefono && req.body.mail
                             && req.body.sexo && req.body.id_os && req.body.numero_os
@@ -120,10 +120,10 @@ module.exports = function(db, pgp){
                                 req.body.sexo, req.body.id_os, req.body.numero_os,
                                 req.body.domicilio, req.body.obs, req.body.celular], qrm.one)
                                 .then(function(data){
-                                    if (data.paciente_crear == 'error-paciente'){
+                                    if (data.paciente_crear === 'error-paciente'){
                                         res.status(400).json({resultado: false, mensaje: "ya existe una Paciente con ese DNI"})
                                     }
-                                    else if(data.paciente_crear == 'error-os'){
+                                    else if(data.paciente_crear === 'error-os'){
                                         res.status(400).json({resultado: false, mensaje: "no se encuentra la obra social"})
                                     }
                                     else {
@@ -156,7 +156,7 @@ module.exports = function(db, pgp){
     }
 
     function modificar(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -165,7 +165,7 @@ module.exports = function(db, pgp){
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    if (decoded.rol == 'usuario' || decoded.rol == 'admin'){
+                    if (decoded.rol === 'usuario' || decoded.rol === 'admin'){
                         if (req.body.nombre && req.body.apellido && req.body.documento
                             && req.body.fecha && req.body.telefono && req.body.mail
                             && req.body.sexo && req.body.id_os && req.body.numero_os
@@ -176,16 +176,16 @@ module.exports = function(db, pgp){
                                 req.body.sexo, req.body.id_os, req.body.numero_os,
                                 req.body.domicilio, req.body.obs, req.body.celular], qrm.one)
                                 .then(function(data){
-                                    if (data.paciente_modificar == 'error-paciente'){
+                                    if (data.paciente_modificar === 'error-paciente'){
                                         res.status(404).json({resultado: false, mensaje: "No se encuentra el paciente"})
                                     }
-                                    else if (data.paciente_modificar == 'error-dni'){
+                                    else if (data.paciente_modificar === 'error-dni'){
                                         res.status(400).json({resultado: false, mensaje: "Ya existe un paciente con ese Documento!"})
                                     }
-                                    else if(data.paciente_modificar == 'error-os'){
+                                    else if(data.paciente_modificar === 'error-os'){
                                         res.status(400).json({resultado: false, mensaje: "no se encuentra la obra social"})
                                     }
-                                    else if(data.paciente_modificar == 'ok'){
+                                    else if(data.paciente_modificar === 'ok'){
                                         res.json({resultado: true, mensaje: "Paciente modificado"})
                                     }
                                     else {
@@ -218,7 +218,7 @@ module.exports = function(db, pgp){
     }
 
     function borrar(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -227,14 +227,14 @@ module.exports = function(db, pgp){
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    if (decoded.rol == "admin"){
+                    if (decoded.rol === "admin"){
                         if (req.params.id){
                             db.func("paciente_borrar", req.params.id, qrm.one)
                                 .then(function(data){
-                                    if (data.paciente_borrar == 'error-paciente'){
+                                    if (data.paciente_borrar === 'error-paciente'){
                                         res.status(404).json({resultado: false, mensaje: "no se encuentra el paciente"})
                                     }
-                                    else if (data.paciente_borrar == 'ok') {
+                                    else if (data.paciente_borrar === 'ok') {
                                         res.json({resultado: true, mensaje: "Paciente borrado"})
                                     }
                                     else{
@@ -244,7 +244,7 @@ module.exports = function(db, pgp){
                                 })
                                 .catch(function(err){
                                     console.log(err);
-                                    if (err.code == '23503'){
+                                    if (err.code === '23503'){
                                         res.status(400).json({resultado: false, mensaje: "El paciente tiene datos relacionados, no se puede borrar!"});
                                     }
                                     else{

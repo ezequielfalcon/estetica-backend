@@ -1,20 +1,20 @@
 /**
  * Created by eze on 16/01/17.
  */
-var bcrypt = require('bcrypt');
-var jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 module.exports= function(db) {
-    var module = {};
+    let module = {};
 
     module.login = login;
 
     function login(req, res, next){
         if (req.body.usuario && req.body.clave){
-            var user = req.body.usuario;
+            const user = req.body.usuario;
             db.oneOrNone("SELECT usuarios.nombre, usuarios.clave, roles.nombre rol FROM usuarios INNER JOIN roles ON usuarios.id_rol = roles.id WHERE usuarios.nombre = $1;", user)
                 .then(function(data){
-                    if (data == null){
+                    if (data === null){
                         console.log("Usuario inexistente intentó inciar sesión: " + user);
                         res.status(400).json({
                             resultado: false,
@@ -22,14 +22,14 @@ module.exports= function(db) {
                         })
                     }
                     else{
-                        var hashDb = data.clave;
+                        const hashDb = data.clave;
                         if (bcrypt.compareSync(req.body.clave, hashDb)){
                             console.log("Inicio de sesión de usuario " + user);
-                            var usuarioDb = {
+                            const usuarioDb = {
                                 nombre: user,
                                 rol: data.rol
                             };
-                            var token = jwt.sign(usuarioDb, process.env.JWT_SECRET, {expiresIn: "20h"});
+                            const token = jwt.sign(usuarioDb, process.env.JWT_SECRET, {expiresIn: "20h"});
                             res.json({
                                 resultado: true,
                                 mensaje: "Sesión iniciada",

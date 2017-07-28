@@ -1,11 +1,11 @@
 /**
  * Created by eze on 11/02/17.
  */
-var jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 module.exports = function(db, pgp) {
-    var module = {};
-    var qrm = pgp.queryResult;
+    const module = {};
+    const qrm = pgp.queryResult;
 
     module.verConfiguracion = verConfiguracion;
     module.verTurnos = verTurnos;
@@ -237,7 +237,7 @@ module.exports = function(db, pgp) {
     }
 
     function modificarCosto(req,res) {
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -246,9 +246,12 @@ module.exports = function(db, pgp) {
                 }
                 else{
                     if (decoded.rol === 'admin' || decoded.rol === 'usuario'){
-                        if (req.params.id && req.body.costo && req.body.costo2 && req.body.costo3){
+                        if (req.params.id){
+                            const costo = req.body.costo || 0;
+                            const costo2 = req.body.costo2 || 0;
+                            const costo3 = req.body.costo3 || 0;
                             db.none("UPDATE agenda SET costo = $1, costo2 = $2, costo3 = $3 WHERE id = $4;",
-                                [req.body.costo, req.body.costo2, req.body.costo3 ,req.params.id], qrm.one)
+                                [costo, costo2, costo3 ,req.params.id], qrm.one)
                                 .then(function(){
                                     res.json({resultado: true, mensaje: "Costo modificado!"})
                                 })
@@ -277,7 +280,7 @@ module.exports = function(db, pgp) {
     }
 
     function verHorarios(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token) {
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
                 if (err) {
@@ -310,7 +313,7 @@ module.exports = function(db, pgp) {
     }
 
     function borrarTurno(req,res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -360,7 +363,7 @@ module.exports = function(db, pgp) {
     }
 
     function agendaPresente(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -368,16 +371,17 @@ module.exports = function(db, pgp) {
                     res.status(401).json({resultado: false, mensaje: "Error de autenticación"});
                 }
                 else{
-                    if (req.body.id_agenda && req.body.presente){
-                        db.func("agenda_presente", [req.body.id_agenda, req.body.presente], qrm.one)
+                    if (req.body.id_agenda){
+                        const presente = req.body.presente === true || false;
+                        db.func("agenda_presente", [req.body.id_agenda, presente], qrm.one)
                             .then(function(data){
-                                if (data.agenda_presente == 'error-agenda'){
+                                if (data.agenda_presente === 'error-agenda'){
                                     res.status(400).json({resultado: false, mensaje: "Error: No se encuentra el turno cargado"})
                                 }
-                                else if (data.agenda_presente == 'error-atendido'){
+                                else if (data.agenda_presente === 'error-atendido'){
                                     res.status(400).json({resultado: false, mensaje: "Paciente ya atendido por el Médico!"});
                                 }
-                                else if (data.agenda_presente == 'ok') {
+                                else if (data.agenda_presente === 'ok') {
                                     res.json({resultado: true, mensaje: "Asistencia confirmada!"})
                                 }
                                 else{
@@ -405,7 +409,7 @@ module.exports = function(db, pgp) {
     }
 
     function nuevoTratamientoTurno(req,res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -417,16 +421,16 @@ module.exports = function(db, pgp) {
                     if (req.body.id_agenda && req.body.id_tratamiento){
                         db.func("agenda_turno_tratamiento", [req.body.id_agenda, req.body.id_tratamiento], qrm.one)
                             .then(function(data){
-                                if (data.agenda_turno_tratamiento == 'error-agenda'){
+                                if (data.agenda_turno_tratamiento === 'error-agenda'){
                                     res.status(400).json({resultado: false, mensaje: "Error al asignar tratamiento: No se encuentra el turno cargado"})
                                 }
-                                else if (data.agenda_turno_tratamiento == 'error-tratamiento') {
+                                else if (data.agenda_turno_tratamiento === 'error-tratamiento') {
                                     res.status(400).json({resultado: false, mensaje: "Error al asignar tratamiento: No se encuentra el tratamiento!"})
                                 }
-                                else if (data.agenda_turno_tratamiento == 'error-existe') {
+                                else if (data.agenda_turno_tratamiento === 'error-existe') {
                                     res.status(400).json({resultado: false, mensaje: "Error al asignar tratamiento: ya está asignado"})
                                 }
-                                else if (data.agenda_turno_tratamiento == 'ok') {
+                                else if (data.agenda_turno_tratamiento === 'ok') {
                                     res.json({resultado: true, mensaje: "Tratamiento agregado correctamente!"})
                                 }
                                 else{
@@ -454,7 +458,7 @@ module.exports = function(db, pgp) {
     }
 
     function crearTurno(req,res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -465,25 +469,26 @@ module.exports = function(db, pgp) {
                     console.log("Usuario " + decoded.nombre + " autorizado");
                     if (req.body.id_turno && req.body.id_paciente && req.body.id_consultorio && req.body.id_medico
                         && req.body.observaciones
-                        && req.body.costo && req.body.fecha && req.body.entreturno){
+                        && req.body.costo && req.body.fecha){
+                        const entreturno = req.body.entreturno === true || false;
                         db.func("agenda_nuevo_turno", [req.body.id_turno, req.body.id_paciente
                            , req.body.id_consultorio, req.body.id_medico
                            , decoded.nombre, req.body.observaciones
-                           , req.body.costo, req.body.fecha, req.body.entreturno], qrm.one)
+                           , req.body.costo, req.body.fecha, entreturno], qrm.one)
                             .then(function(data){
-                                if (data.agenda_nuevo_turno == 'error-turno'){
+                                if (data.agenda_nuevo_turno === 'error-turno'){
                                     res.status(400).json({resultado: false, mensaje: "No se encuentra el horario de turno"})
                                 }
-                                else if (data.agenda_nuevo_turno == 'error-paciente') {
+                                else if (data.agenda_nuevo_turno === 'error-paciente') {
                                     res.status(400).json({resultado: false, mensaje: "No se encuentra el paciente"})
                                 }
-                                else if (data.agenda_nuevo_turno == 'error-consultorio') {
+                                else if (data.agenda_nuevo_turno === 'error-consultorio') {
                                     res.status(400).json({resultado: false, mensaje: "No se encuentra el consultorio"})
                                 }
-                                else if (data.agenda_nuevo_turno == 'error-medico') {
+                                else if (data.agenda_nuevo_turno === 'error-medico') {
                                     res.status(400).json({resultado: false, mensaje: "No se encuentra el médico"})
                                 }
-                                else if (data.agenda_nuevo_turno == 'error-agenda') {
+                                else if (data.agenda_nuevo_turno === 'error-agenda') {
                                     res.status(400).json({resultado: false, mensaje: "Ya existe un turno en ese horario y consultorio!"})
                                 }
                                 else if (data.agenda_nuevo_turno === 'error-ausente') {
@@ -514,7 +519,7 @@ module.exports = function(db, pgp) {
     }
 
     function verTurnosListados(req, res) {
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token) {
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
                 if (err) {
@@ -563,7 +568,7 @@ module.exports = function(db, pgp) {
     }
 
     function verTurnos(req, res) {
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token) {
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
                 if (err) {
@@ -642,7 +647,7 @@ module.exports = function(db, pgp) {
     }
 
     function verTurnoPorId(req,res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token) {
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
                 if (err) {
@@ -683,7 +688,7 @@ module.exports = function(db, pgp) {
     }
 
     function verAgendaResumen(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token) {
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
                 if (err) {
@@ -722,7 +727,7 @@ module.exports = function(db, pgp) {
     }
 
     function verConfiguracion(req, res) {
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token) {
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
                 if (err) {

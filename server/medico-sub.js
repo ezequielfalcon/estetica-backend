@@ -1,17 +1,17 @@
 /**
  * Created by eze on 15/04/17.
  */
-var jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 module.exports = function(db, pgp) {
-    var module = {};
-    var qrm = pgp.queryResult;
+    let module = {};
+    const qrm = pgp.queryResult;
 
     module.turnos = turnos;
     module.atendido = atendido;
 
     function atendido(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -20,7 +20,7 @@ module.exports = function(db, pgp) {
                 }
                 else{
                     if (decoded.rol === 'medico'){
-                        var medicoString = decoded.nombre;
+                        const medicoString = decoded.nombre;
                         if (req.params.id){
                             db.func('medico_turno_atendido', [req.params.id, medicoString], qrm.one)
                                 .then(function(data){
@@ -64,7 +64,7 @@ module.exports = function(db, pgp) {
     }
 
     function turnos(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -73,7 +73,7 @@ module.exports = function(db, pgp) {
                 }
                 else{
                     if (decoded.rol === 'medico'){
-                        var medicoString = decoded.nombre;
+                        const medicoString = decoded.nombre;
                         if (req.params.fecha){
                             db.manyOrNone("select agenda.id, concat(pacientes.apellido, ' ', pacientes.nombre) paciente, agenda.id_consultorio, agenda.id_turno, agenda.entreturno, agenda.presente, agenda.atendido, agenda.hora_llegada from agenda inner join pacientes on agenda.id_paciente = pacientes.id  inner join medicos on agenda.id_medico = medicos.id INNER JOIN usuario_medico ON medicos.id = usuario_medico.id_medico inner join usuarios ON usuario_medico.usuario = usuarios.nombre where usuarios.nombre = $1 AND agenda.fecha =  $2;",
                                 [medicoString, req.params.fecha])

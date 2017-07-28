@@ -1,11 +1,11 @@
 /**
  * Created by eze on 18/01/17.
  */
-var jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 module.exports = function(db, pgp){
-    var module = {};
-    var qrm = pgp.queryResult;
+    let module = {};
+    const qrm = pgp.queryResult;
 
     module.crear = crear;
     module.borrar = borrar;
@@ -13,7 +13,7 @@ module.exports = function(db, pgp){
     module.modificar = modificar;
 
     function modificar(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -22,18 +22,18 @@ module.exports = function(db, pgp){
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    if (decoded.rol == "admin"){
+                    if (decoded.rol === "admin"){
                         if (req.params.id && req.body.nombre){
                             db.func("obra_social_modificar", [req.params.id, req.body.nombre], qrm.one)
                                 .then(function(data){
-                                    if (data.obra_social_modificar == 'error-obra'){
+                                    if (data.obra_social_modificar === 'error-obra'){
                                         res.status(404).json({resultado: false, mensaje: "No se encuentra la Obra Social"});
                                         console.log("error 404 en funcion ObraSocialModificar");
                                     }
-                                    else if(data.obra_social_modificar == 'error-existe'){
+                                    else if(data.obra_social_modificar === 'error-existe'){
                                         res.status(400).json({resultado: false, mensaje: "Ya existe una Obra Social con ese nombre"})
                                     }
-                                    else if (data.obra_social_modificar == 'ok'){
+                                    else if (data.obra_social_modificar === 'ok'){
                                         res.json({resultado: true, mensaje: "Obra Social modificada"})
                                     }
                                     else{
@@ -67,7 +67,7 @@ module.exports = function(db, pgp){
     }
 
     function traer(req,res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -113,7 +113,7 @@ module.exports = function(db, pgp){
     }
 
     function crear(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -122,11 +122,11 @@ module.exports = function(db, pgp){
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    if (decoded.rol == "admin"){
+                    if (decoded.rol === "admin"){
                         if (req.body.nombre){
                             db.func("obra_social_crear", req.body.nombre, qrm.one)
                                 .then(function(data){
-                                    if (data.obra_social_crear == 'error-obra'){
+                                    if (data.obra_social_crear === 'error-obra'){
                                         res.status(400).json({resultado: false, mensaje: "ya existe una Obra Social con ese nombre"})
                                     }
                                     else {
@@ -159,7 +159,7 @@ module.exports = function(db, pgp){
     }
 
     function borrar(req, res){
-        var token = req.headers['x-access-token'];
+        const token = req.headers['x-access-token'];
         if (token){
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
@@ -168,17 +168,17 @@ module.exports = function(db, pgp){
                 }
                 else{
                     console.log("Usuario " + decoded.nombre + " autorizado");
-                    if (decoded.rol == "admin"){
+                    if (decoded.rol === "admin"){
                         if (req.params.id){
                             db.func("obra_social_borrar", req.params.id, qrm.one)
                                 .then(function(data){
-                                    if (data.obra_social_borrar == 'error-obra'){
+                                    if (data.obra_social_borrar === 'error-obra'){
                                         res.status(400).json({resultado: false, mensaje: "no existe una Obra Social con ese nombre"})
                                     }
-                                    else if(data.obra_social_borrar == 'error-pacientes'){
+                                    else if(data.obra_social_borrar === 'error-pacientes'){
                                         res.status(400).json({resultado: false, mensaje: "La obra social está siendo usada por algún paciente"})
                                     }
-                                    else if (data.obra_social_borrar == 'ok') {
+                                    else if (data.obra_social_borrar === 'ok') {
                                         res.json({resultado: true, mensaje: "Obra Social borrada"})
                                     }
                                     else{
@@ -188,7 +188,7 @@ module.exports = function(db, pgp){
                                 })
                                 .catch(function(err){
                                     console.log(err);
-                                    if (err.code == '23503'){
+                                    if (err.code === '23503'){
                                         res.status(400).json({resultado: false, mensaje: "La obra social tiene datos relacionados, no se puede borrar!"});
                                     }
                                     else{
