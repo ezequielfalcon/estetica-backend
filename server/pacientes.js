@@ -102,13 +102,17 @@ module.exports = function(db, pgp) {
                     console.log("Usuario " + decoded.nombre + " autorizado");
                     if (decoded.rol === 'usuario' || decoded.rol === 'admin') {
                         if (req.body.nombre && req.body.apellido && req.body.documento &&
-                            req.body.fecha && req.body.telefono && req.body.mail &&
-                            req.body.sexo && req.body.id_os && req.body.numero_os &&
-                            req.body.domicilio && req.body.obs && req.body.celular) {
+                            req.body.sexo && req.body.id_os) {
+                            const fecha = req.body.fecha || null;
+                            const telefono = req.body.telefono || '';
+                            const mail = req.body.mail || '';
+                            const numero_os = req.body.numero_os || '';
+                            const domicilio = req.body.domicilio || '';
+                            const celular = req.body.celular || '';
                             db.func("paciente_crear", [req.body.nombre, req.body.apellido, req.body.documento,
-                                    req.body.fecha, req.body.telefono, req.body.mail,
-                                    req.body.sexo, req.body.id_os, req.body.numero_os,
-                                    req.body.domicilio, req.body.obs, req.body.celular
+                                    fecha, telefono, mail,
+                                    req.body.sexo, req.body.id_os, numero_os,
+                                    domicilio, null, celular
                                 ], qrm.one)
                                 .then(function(data) {
                                     if (data.paciente_crear === 'error-paciente') {
