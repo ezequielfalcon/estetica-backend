@@ -42,37 +42,43 @@ module.exports = function(db, pgp) {
                                 if (pacientes) {
                                     let resultadoPacientes = [];
                                     let pacientesListos = 0;
-                                    for (let paciente of pacientes) {
-                                        let nuevoTurno = {};
-                                        nuevoTurno.id_paciente = paciente.id_paciente;
-                                        nuevoTurno.paciente = paciente.paciente;
-                                        db.one('SELECT * FROM agenda WHERE id_paciente = $1 AND agenda.fecha = $2 AND agenda.id_medico = $3 ORDER BY id_turno ASC, entreturno ASC LIMIT 1;', [paciente.id_paciente, req.params.fecha, req.params.medico])
-                                            .then(turno => {
-                                                nuevoTurno.id = turno.id;
-                                                nuevoTurno.telefono = turno.telefono;
-                                                nuevoTurno.id_consultorio = turno.id_consultorio;
-                                                nuevoTurno.id_turno = turno.id_turno;
-                                                nuevoTurno.entreturno = turno.entreturno;
-                                                nuevoTurno.presente = turno.presente;
-                                                nuevoTurno.atendido = turno.atendido;
-                                                nuevoTurno.hora_llegada = turno.hora_llegada;
-                                                nuevoTurno.costo = turno.costo;
-                                                nuevoTurno.costo2 = turno.costo2;
-                                                nuevoTurno.costo3 = turno.costo3;
-                                                nuevoTurno.usuario = turno.usuario;
-                                                nuevoTurno.telefono = paciente.telefono;
-                                                pacientesListos++;
-                                                resultadoPacientes.push(nuevoTurno);
-                                                if (pacientesListos === pacientes.length) {
-                                                    resultadoPacientes.sort(ordenarTurnos);
-                                                    res.json({ resultado: true, datos: resultadoPacientes })
-                                                }
-                                            })
-                                            .catch(function(err) {
-                                                console.log(err);
-                                                res.status(500).json({ resultado: false, mensaje: err })
-                                            })
+                                    if (pacientes.length > 0) {
+                                        for (let paciente of pacientes) {
+                                            let nuevoTurno = {};
+                                            nuevoTurno.id_paciente = paciente.id_paciente;
+                                            nuevoTurno.paciente = paciente.paciente;
+                                            db.one('SELECT * FROM agenda WHERE id_paciente = $1 AND agenda.fecha = $2 AND agenda.id_medico = $3 ORDER BY id_turno ASC, entreturno ASC LIMIT 1;', [paciente.id_paciente, req.params.fecha, req.params.medico])
+                                                .then(turno => {
+                                                    nuevoTurno.id = turno.id;
+                                                    nuevoTurno.telefono = turno.telefono;
+                                                    nuevoTurno.id_consultorio = turno.id_consultorio;
+                                                    nuevoTurno.id_turno = turno.id_turno;
+                                                    nuevoTurno.entreturno = turno.entreturno;
+                                                    nuevoTurno.presente = turno.presente;
+                                                    nuevoTurno.atendido = turno.atendido;
+                                                    nuevoTurno.hora_llegada = turno.hora_llegada;
+                                                    nuevoTurno.costo = turno.costo;
+                                                    nuevoTurno.costo2 = turno.costo2;
+                                                    nuevoTurno.costo3 = turno.costo3;
+                                                    nuevoTurno.usuario = turno.usuario;
+                                                    nuevoTurno.telefono = paciente.telefono;
+                                                    pacientesListos++;
+                                                    resultadoPacientes.push(nuevoTurno);
+                                                    if (pacientesListos === pacientes.length) {
+                                                        resultadoPacientes.sort(ordenarTurnos);
+                                                        res.json({ resultado: true, datos: resultadoPacientes })
+                                                    }
+                                                })
+                                                .catch(function(err) {
+                                                    console.log(err);
+                                                    res.status(500).json({ resultado: false, mensaje: err })
+                                                })
+
+                                        }
+                                    } else {
+                                        res.json({ resultado: true, datos: {} })
                                     }
+
                                 } else {
                                     res.json({ resultado: true, datos: {} })
                                 }
