@@ -1,6 +1,7 @@
 let express = require('express');
 let app = express();
 let bodyParser = require('body-parser');
+const fileUpload = require('express-fileupload');
 const pgp = require("pg-promise")();
 
 const cn = {
@@ -38,6 +39,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+app.use(fileUpload());
 app.set('port', (process.env.PORT || 5000));
 
 
@@ -140,12 +142,12 @@ app.get('/api', function(req, res) {
     })
 });
 
-const server = app.listen(app.get('port'), function () {
+const server = app.listen(app.get('port'), function() {
     console.log('Backend escuchando en puerto ', app.get('port'));
 });
 
 const jsreport = require('jsreport')({
-    express: {app: reportingApp, server: server},
+    express: { app: reportingApp, server: server },
     appPath: "/reportes",
     connectionString: {
         name: "mongodb",
@@ -164,6 +166,6 @@ const jsreport = require('jsreport')({
 });
 jsreport.use(require('jsreport-authentication')({}));
 
-jsreport.init().catch(function (e) {
+jsreport.init().catch(function(e) {
     console.error(e);
 });
