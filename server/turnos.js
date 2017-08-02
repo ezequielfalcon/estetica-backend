@@ -20,6 +20,167 @@ module.exports = function(db, pgp) {
     module.verTurnosListado = verTurnosListados;
     module.turnosPorPaciente = turnosPorPaciente;
     module.verTurnosListadoNew = verTurnosListadoNew;
+    module.cargarHistoria = cargarHistoria;
+    module.cargarFoto = cargarFoto;
+    module.verHistoria = verHistoria;
+    module.verFoto = verFoto;
+
+    function verFoto(req, res) {
+        const token = req.headers['x-access-token'];
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+                if (err) {
+                    console.log('Error de autenticación, token inválido!\n' + err);
+                    res.status(401).json({
+                        resultado: false,
+                        mensaje: 'Error de autenticación',
+                    });
+                } else {
+                    if (req.params.id) {
+                        db.oneOrNone('SELECT foto FROM info_agenda WHERE id = $1;', req.params.id)
+                            .then(foto => {
+                                if (foto) {
+                                    res.status(200).contentType('image/jpeg').end(foto.foto, 'binary');
+                                } else {
+                                    res.status(404).json({resultado: false, mensaje: 'Foto no encontrada'})
+                                }
+                            })
+                            .catch(err => {
+                                console.error(err);
+                                res.status(500).json({resultado: false, mensaje: err.detail})
+                            })
+                    } else {
+                        res.status(400).json({resultado: false, mensaje: 'Faltan parámetros!'});
+                    }
+                }
+            });
+        } else {
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.',
+            });
+        }
+    }
+
+    function verHistoria(req, res) {
+        const token = req.headers['x-access-token'];
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+                if (err) {
+                    console.log('Error de autenticación, token inválido!\n' + err);
+                    res.status(401).json({
+                        resultado: false,
+                        mensaje: 'Error de autenticación',
+                    });
+                } else {
+                    if (req.params.id_agenda) {
+                        db.manyOrNone('SELECT id, comentario FROM info_agenda WHERE id_agenda = $1;', req.params.id_agenda)
+                            .then(historias => {
+                                res.json({resultado: true, datos: historias})
+                            })
+                            .catch(err => {
+                                console.error(err);
+                                res.status(500).json({resultado: false, mensaje: err.detail})
+                            })
+                    } else {
+                        res.status(400).json({resultado: false, mensaje: 'Faltan parámetros!'});
+                    }
+                }
+            });
+        } else {
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.',
+            });
+        }
+    }
+
+    function cargarFoto(req, res) {
+        const token = req.headers['x-access-token'];
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+                if (err) {
+                    console.log('Error de autenticación, token inválido!\n' + err);
+                    res.status(401).json({
+                        resultado: false,
+                        mensaje: 'Error de autenticación',
+                    });
+                } else {
+                    if (req.params.id && req.files) {
+                        if (req.files.foto) {
+                            const foto = req.files.foto;
+                            if (foto.mimetype === 'image/jpeg') {
+                                db.oneOrNone('SELECT id FROM info_agenda WHERE id = $1;', req.params.id)
+                                    .then(existeHistoria => {
+                                        if (existeHistoria) {
+                                            db.none('UPDATE info_agenda SET foto = $1 WHERE id = $2;', [foto, req.params.id])
+                                                .then(() => {
+                                                    res.json({resultado: true})
+                                                })
+                                                .catch(err => {
+                                                    console.error(err);
+                                                    res.status(500).json({resultado: false, mensaje: err.detail})
+                                                })
+                                        } else {
+                                            res.status(404).json({resultado: false, mensaje: 'No se encuentra la historia!'})
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.error(err);
+                                        res.status(500).json({resultado: false, mensaje: err.detail})
+                                    })
+                            } else {
+                                res.status(400).json({resultado: false, mensaje: 'El formato de la foto no es admitido, sólo JPEG'});
+                            }
+                        } else {
+                            res.status(400).json({resultado: false, mensaje: 'Faltan parámetros!'});
+                        }
+                    } else {
+                        res.status(400).json({resultado: false, mensaje: 'Faltan parámetros!'});
+                    }
+                }
+            });
+        } else {
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.',
+            });
+        }
+    }
+
+    function cargarHistoria(req, res) {
+        const token = req.headers['x-access-token'];
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+                if (err) {
+                    console.log('Error de autenticación, token inválido!\n' + err);
+                    res.status(401).json({
+                        resultado: false,
+                        mensaje: 'Error de autenticación',
+                    });
+                } else {
+                    if (req.body.id_agenda && req.body.comentarios) {
+                        db.one('INSERT INTO info_agenda (id_agenda, comentario) VALUES ($1, $2) RETURNING id;', 
+                            [req.body.id_agenda, req.body.comentarios])
+                            .then(historias => {
+                                res.json({resultado: true, id: historias.id})
+                            })
+                            .catch(err => {
+                                console.error(err);
+                                res.status(500).json({resultado: false, mensaje: err.detail})
+                            })
+                    } else {
+                        res.status(400).json({resultado: false, mensaje: 'Faltan parámetros!'});
+                    }
+                }
+            });
+        } else {
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.',
+            });
+        }
+    }
 
     function verTurnosListadoNew(req, res) {
         let token = req.headers['x-access-token'];
@@ -281,7 +442,7 @@ module.exports = function(db, pgp) {
                     });
                 } else {
                     db.manyOrNone("select * from turnos order by id;",
-                            req.params.fecha)
+                        req.params.fecha)
                         .then(function(data) {
                             res.json({ resultado: true, datos: data });
                         })
@@ -651,7 +812,7 @@ module.exports = function(db, pgp) {
                 } else {
                     if (req.params.fecha) {
                         db.manyOrNone("SELECT agenda.id_consultorio consultorio, agenda.id_turno turno, agenda.usuario usuario, agenda.entreturno entreturno, medicos.apellido apellido, agenda.presente presente, agenda.atendido atendido, agenda.hora_llegada hora_llegada FROM agenda INNER JOIN medicos ON agenda.id_medico = medicos.id WHERE agenda.fecha = $1;",
-                                req.params.fecha)
+                            req.params.fecha)
                             .then(function(data) {
                                 res.json({ resultado: true, datos: data });
                             })
