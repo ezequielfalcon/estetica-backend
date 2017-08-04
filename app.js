@@ -136,8 +136,8 @@ app.put('/api/sub-medicos/turnos/:id', medicosSub.atendido);
 //historia
 app.get('/api/historia/:id_agenda', turnos.verHistoria);
 app.post('/api/historia', turnos.cargarHistoria);
-app.get('/fotos/:id', turnos.verFoto);
-app.post('/fotos'. turnos.cargarFoto);
+app.get('/api/fotos/:id', turnos.verFoto);
+app.post('/api/fotos'. turnos.cargarFoto);
 
 const reportingApp = express();
 app.use('/reportes', reportingApp);
