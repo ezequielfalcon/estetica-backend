@@ -133,6 +133,12 @@ app.get('/api/cuenta-corriente', ctacte.consultar);
 app.get('/api/sub-medicos/turnos/:fecha', medicosSub.turnos);
 app.put('/api/sub-medicos/turnos/:id', medicosSub.atendido);
 
+//historia
+app.get('/api/historia/:id_agenda', turnos.verHistoria);
+app.post('/api/historia', turnos.cargarHistoria);
+app.get('/fotos/:id', turnos.verFoto);
+app.post('/fotos'. turnos.cargarFoto);
+
 const reportingApp = express();
 app.use('/reportes', reportingApp);
 
