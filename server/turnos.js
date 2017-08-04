@@ -74,7 +74,7 @@ module.exports = function(db, pgp) {
                     });
                 } else {
                     if (req.params.id_agenda) {
-                        db.manyOrNone('SELECT id, comentario FROM info_agenda WHERE id_agenda = $1;', req.params.id_agenda)
+                        db.oneOrNone('SELECT id, comentario FROM info_agenda WHERE id_agenda = $1;', req.params.id_agenda)
                             .then(historias => {
                                 res.json({resultado: true, datos: historias})
                             })
