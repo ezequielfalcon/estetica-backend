@@ -40,7 +40,7 @@ module.exports = function(db, pgp) {
                         db.oneOrNone('SELECT foto FROM info_agenda WHERE id = $1;', req.params.id)
                             .then(foto => {
                                 if (foto) {
-                                    res.status(200).contentType('image/jpeg').end(foto.foto, 'binary');
+                                    res.json({resultado: true, foto: foto.foto})
                                 } else {
                                     res.status(404).json({resultado: false, mensaje: 'Foto no encontrada'})
                                 }
@@ -110,35 +110,26 @@ module.exports = function(db, pgp) {
                         mensaje: 'Error de autenticación',
                     });
                 } else {
-                    if (req.params.id && req.files) {
-                        if (req.files.foto) {
-                            const foto = req.files.foto;
-                            if (foto.mimetype === 'image/jpeg') {
-                                db.oneOrNone('SELECT id FROM info_agenda WHERE id = $1;', req.params.id)
-                                    .then(existeHistoria => {
-                                        if (existeHistoria) {
-                                            db.none('UPDATE info_agenda SET foto = $1 WHERE id = $2;', [foto, req.params.id])
-                                                .then(() => {
-                                                    res.json({resultado: true})
-                                                })
-                                                .catch(err => {
-                                                    console.error(err);
-                                                    res.status(500).json({resultado: false, mensaje: err.detail})
-                                                })
-                                        } else {
-                                            res.status(404).json({resultado: false, mensaje: 'No se encuentra la historia!'})
-                                        }
-                                    })
-                                    .catch(err => {
-                                        console.error(err);
-                                        res.status(500).json({resultado: false, mensaje: err.detail})
-                                    })
-                            } else {
-                                res.status(400).json({resultado: false, mensaje: 'El formato de la foto no es admitido, sólo JPEG'});
-                            }
-                        } else {
-                            res.status(400).json({resultado: false, mensaje: 'Faltan parámetros!'});
-                        }
+                    if (req.params.id && req.body.foto_uri) {
+                        db.oneOrNone('SELECT id FROM info_agenda WHERE id = $1;', req.params.id)
+                            .then(existeHistoria => {
+                                if (existeHistoria) {
+                                    db.none('UPDATE info_agenda SET foto = $1 WHERE id = $2;', [req.body.foto_uri, req.params.id])
+                                        .then(() => {
+                                            res.json({resultado: true})
+                                        })
+                                        .catch(err => {
+                                            console.error(err);
+                                            res.status(500).json({resultado: false, mensaje: err.detail})
+                                        })
+                                } else {
+                                    res.status(404).json({resultado: false, mensaje: 'No se encuentra la historia!'})
+                                }
+                            })
+                            .catch(err => {
+                                console.error(err);
+                                res.status(500).json({resultado: false, mensaje: err.detail})
+                            })
                     } else {
                         res.status(400).json({resultado: false, mensaje: 'Faltan parámetros!'});
                     }
