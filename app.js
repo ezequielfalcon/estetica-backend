@@ -35,7 +35,7 @@ app.use(function(req, res, next) {
 
 //asd
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({'type': '*/*', limit: '20mb'}));
 app.use(bodyParser.urlencoded({
     extended: true
 }));
