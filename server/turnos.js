@@ -76,7 +76,11 @@ module.exports = function(db, pgp) {
                     if (req.params.id_agenda) {
                         db.oneOrNone('SELECT id, comentario FROM info_agenda WHERE id_agenda = $1;', req.params.id_agenda)
                             .then(historias => {
-                                res.json({resultado: true, datos: historias})
+                                if (historias) {
+                                    res.json({resultado: true, datos: historias})
+                                } else {
+                                    res.status(404).json({resultado: false})
+                                }
                             })
                             .catch(err => {
                                 console.error(err);
@@ -160,7 +164,7 @@ module.exports = function(db, pgp) {
                     });
                 } else {
                     if (req.body.id_agenda && req.body.comentarios) {
-                        db.one('INSERT INTO info_agenda (id_agenda, comentario) VALUES ($1, $2) RETURNING id;', 
+                        db.one('INSERT INTO info_agenda (id_agenda, comentario) VALUES ($1, $2) RETURNING id;',
                             [req.body.id_agenda, req.body.comentarios])
                             .then(historias => {
                                 res.json({resultado: true, id: historias.id})
