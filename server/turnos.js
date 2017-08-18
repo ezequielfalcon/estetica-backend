@@ -24,6 +24,7 @@ module.exports = function(db, pgp) {
     module.cargarFoto = cargarFoto;
     module.verHistoria = verHistoria;
     module.verFoto = verFoto;
+    module.turnosPorMedicoResumen = verTurnosListadoNewMedico;
 
     function verFoto(req, res) {
         const token = req.headers['x-access-token'];
