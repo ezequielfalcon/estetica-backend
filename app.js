@@ -123,6 +123,8 @@ app.put('/api/agenda/modificar-costo/:id', turnos.modificarCosto);
 app.get('/api/listado-turnos/:fecha/:medico', turnos.verTurnosListadoNew);
 //turnos por paciente
 app.get('/api/turnos-paciente/:paciente', turnos.turnosPorPaciente);
+//listado para medicos
+app.get('/api/turnos-medico/:medico/:fechaOld/:fechaNew', turnos.turnosPorMedicoResumen);
 
 //cuenta corriente
 app.get('/api/cuenta-corriente/:id', ctacte.consultar);
