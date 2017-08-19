@@ -24,6 +24,7 @@ module.exports = function(db, pgp) {
     module.cargarFoto = cargarFoto;
     module.verHistoria = verHistoria;
     module.verFoto = verFoto;
+    module.turnosPorMedicoResumen = verTurnosListadoNewMedico;
 
     function verFoto(req, res) {
         const token = req.headers['x-access-token'];
@@ -290,6 +291,44 @@ module.exports = function(db, pgp) {
                                 }
                             })
                             .catch(function(err) {
+                                console.log(err);
+                                res.status(500).json({ resultado: false, mensaje: err })
+                            })
+                    } else {
+                        console.log("Agenda sin todos los datos necesarios");
+                        res.status(400).json({ resultado: false, mensaje: "Faltan parámetros para ver los turnos" })
+                    }
+                }
+            });
+        } else {
+            res.status(401).json({
+                resultado: false,
+                mensaje: 'No token provided.'
+            });
+        }
+    }
+
+    function verTurnosListadoNewMedico(req, res) {
+        let token = req.headers['x-access-token'];
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, function(err) {
+                if (err) {
+                    console.log("Error de autenticación, token inválido!\n" + err);
+                    res.status(401).json({
+                        resultado: false,
+                        mensaje: "Error de autenticación"
+                    });
+                } else {
+                    if (req.params.medico && req.params.fechaOld && req.params.fechaNew) {
+                        db.manyOrNone("select DISTINCT ON (agenda.id_paciente) id_paciente, " +
+                            "CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente, CONCAT(pacientes.telefono, ' | ', pacientes.celular) telefono, agenda.fecha " +
+                            "from agenda " +
+                            "inner join pacientes on agenda.id_paciente = pacientes.id " +
+                            "where fecha >= $1 and fecha <= $2 and id_medico = $3;", [req.params.fechaOld, req.params.fechaNew, req.params.medico])
+                            .then(pacientes => {
+                                res.json({resultado: true, datos: pacientes})
+                            })
+                            .catch(err => {
                                 console.log(err);
                                 res.status(500).json({ resultado: false, mensaje: err })
                             })

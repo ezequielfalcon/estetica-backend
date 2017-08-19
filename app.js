@@ -105,6 +105,7 @@ app.get('/api/tratamientos-agenda/:id', tratamientos.traerAgenda);
 app.post('/api/tratamientos', tratamientos.crear);
 app.put('/api/tratamientos/:id', tratamientos.modificar);
 app.delete('/api/tratamientos/:id', tratamientos.borrar);
+app.get('/api/tratamientos-busqueda/:fechaOld/:fechaNew', tratamientos.tratamientosBusqueda);
 
 //turnos
 app.get('/api/configuracion-turnos', turnos.verConfiguracion);
@@ -123,6 +124,8 @@ app.put('/api/agenda/modificar-costo/:id', turnos.modificarCosto);
 app.get('/api/listado-turnos/:fecha/:medico', turnos.verTurnosListadoNew);
 //turnos por paciente
 app.get('/api/turnos-paciente/:paciente', turnos.turnosPorPaciente);
+//listado para medicos
+app.get('/api/turnos-medico/:medico/:fechaOld/:fechaNew', turnos.turnosPorMedicoResumen);
 
 //cuenta corriente
 app.get('/api/cuenta-corriente/:id', ctacte.consultar);
