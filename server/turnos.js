@@ -324,7 +324,7 @@ module.exports = function(db, pgp) {
                             "CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente, CONCAT(pacientes.telefono, ' | ', pacientes.celular) telefono, agenda.fecha " +
                             "from agenda " +
                             "inner join pacientes on agenda.id_paciente = pacientes.id " +
-                            "where fecha between $1 and $2 and id_medico = $3;", [req.params.fechaOld, req.params.fechaNew, req.params.medico])
+                            "where fecha >= $1 and fecha <= $2 and id_medico = $3;", [req.params.fechaOld, req.params.fechaNew, req.params.medico])
                             .then(pacientes => {
                                 res.json({resultado: true, datos: pacientes})
                             })
