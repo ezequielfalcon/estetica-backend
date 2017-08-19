@@ -319,14 +319,16 @@ module.exports = function(db, pgp) {
                         mensaje: "Error de autenticación"
                     });
                 } else {
-                    console.log('log de prueba de medicos: ' + req.body);
+                    console.log('log de prueba de medicos: ' + req.params);
                     if (req.params.medico && req.prarams.fechaOld && req.params.fechaNew) {
+                        console.log('tirando query');
                         db.manyOrNone("select DISTINCT ON (agenda.id_paciente) id_paciente, " +
                             "CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente, CONCAT(pacientes.telefono, ' | ', pacientes.celular) telefono, agenda.fecha " +
                             "from agenda " +
                             "inner join pacientes on agenda.id_paciente = pacientes.id " +
                             "where fecha between $1 and $2 and id_medico = $3;", [req.params.fechaOld, req.params.fechaNew, req.params.medico])
                             .then(pacientes => {
+                                console.log('query bien');
                                 res.json({resultado: true, datos: pacientes})
                             })
                             .catch(err => {
