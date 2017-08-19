@@ -319,7 +319,10 @@ module.exports = function(db, pgp) {
                         mensaje: "Error de autenticación"
                     });
                 } else {
-                    console.log('log de prueba de medicos: ' + req.params);
+                    console.log('log de prueba de medicos: ');
+                    console.log(req.params.medico);
+                    console.log(req.params.fechaOld);
+                    console.log(req.params.fechaNew);
                     if (req.params.medico && req.prarams.fechaOld && req.params.fechaNew) {
                         console.log('tirando query');
                         db.manyOrNone("select DISTINCT ON (agenda.id_paciente) id_paciente, " +
