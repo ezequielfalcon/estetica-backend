@@ -35,7 +35,7 @@ module.exports = function(db, pgp) {
                           let nuevoTrat = {};
                           nuevoTrat.id = tratamiento.id;
                           nuevoTrat.nombre = tratamiento.nombre;
-                          db.one('SELECT COUNT(*) FROM agenda ' +
+                          db.one('SELECT COUNT(*) cant FROM agenda ' +
                             'INNER JOIN tratamientos_por_turno ' +
                             'ON agenda.id = tratamientos_por_turno.id_agenda ' +
                             'INNER JOIN tratamientos ' +
@@ -43,7 +43,7 @@ module.exports = function(db, pgp) {
                             'WHERE tratamientos.id = $1 AND agenda.fecha >= $2 ' +
                             'AND agenda.fecha <= $3;', [tratamiento.id, req.params.fechaOld, req.params.fechaNew])
                             .then(cantidadTrat => {
-                                tratamiento.cantidad = cantidadTrat.count;
+                                nuevoTrat.cantidad = cantidadTrat.cant;
                                 tratamientosListos++;
                                 resultadoTratamientos.push(nuevoTrat);
                                 if (tratamientosListos === tratamientos.length) {
