@@ -105,6 +105,7 @@ app.get('/api/tratamientos-agenda/:id', tratamientos.traerAgenda);
 app.post('/api/tratamientos', tratamientos.crear);
 app.put('/api/tratamientos/:id', tratamientos.modificar);
 app.delete('/api/tratamientos/:id', tratamientos.borrar);
+app.get('/api/tratamientos-busqueda/:fechaOld/:fechaNew', tratamientos.tratamientosBusqueda);
 
 //turnos
 app.get('/api/configuracion-turnos', turnos.verConfiguracion);
