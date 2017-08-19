@@ -319,6 +319,7 @@ module.exports = function(db, pgp) {
                         mensaje: "Error de autenticación"
                     });
                 } else {
+                    console.log('log de prueba de medicos: ' + req.body);
                     if (req.params.medico && req.prarams.fechaOld && req.params.fechaNew) {
                         db.manyOrNone("select DISTINCT ON (agenda.id_paciente) id_paciente, " +
                             "CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente, CONCAT(pacientes.telefono, ' | ', pacientes.celular) telefono, agenda.fecha " +
@@ -328,7 +329,7 @@ module.exports = function(db, pgp) {
                             .then(pacientes => {
                                 res.json({resultado: true, datos: pacientes})
                             })
-                            .catch(function(err) {
+                            .catch(err => {
                                 console.log(err);
                                 res.status(500).json({ resultado: false, mensaje: err })
                             })
