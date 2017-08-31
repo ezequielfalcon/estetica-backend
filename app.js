@@ -148,12 +148,12 @@ app.get('/api', function(req, res) {
     })
 });
 
-const reportingApp = express();
-app.use('/reportes', reportingApp);
-
 const server = app.listen(app.get('port'), function() {
     console.log('Backend escuchando en puerto ', app.get('port'));
 });
+
+const reportingApp = express();
+app.use('/reportes', reportingApp);
 
 const jsreport = require('jsreport')({
     express: { app: reportingApp, server: server },
