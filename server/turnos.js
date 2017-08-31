@@ -319,16 +319,16 @@ module.exports = function(db, pgp) {
                         mensaje: "Error de autenticación"
                     });
                 } else {
-                    if (req.params.medico && req.prarams.fechaOld && req.params.fechaNew) {
+                    if (req.params.medico && req.params.fechaOld && req.params.fechaNew) {
                         db.manyOrNone("select DISTINCT ON (agenda.id_paciente) id_paciente, " +
                             "CONCAT(pacientes.apellido, ' ', pacientes.nombre) paciente, CONCAT(pacientes.telefono, ' | ', pacientes.celular) telefono, agenda.fecha " +
                             "from agenda " +
                             "inner join pacientes on agenda.id_paciente = pacientes.id " +
-                            "where fecha between $1 and $2 and id_medico = $3;", [req.params.fechaOld, req.params.fechaNew, req.params.medico])
+                            "where fecha >= $1 and fecha <= $2 and id_medico = $3;", [req.params.fechaOld, req.params.fechaNew, req.params.medico])
                             .then(pacientes => {
                                 res.json({resultado: true, datos: pacientes})
                             })
-                            .catch(function(err) {
+                            .catch(err => {
                                 console.log(err);
                                 res.status(500).json({ resultado: false, mensaje: err })
                             })

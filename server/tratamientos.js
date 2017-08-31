@@ -12,6 +12,81 @@ module.exports = function(db, pgp) {
     module.traer = traer;
     module.modificar = modificar;
     module.traerAgenda = traerAgenda;
+    module.tratamientosBusqueda = tratamientosBusqueda;
+
+    function tratamientosBusqueda(req, res) {
+      let token = req.headers['x-access-token'];
+      if (token) {
+        jwt.verify(token, process.env.JWT_SECRET, function(err) {
+          if (err) {
+            console.log("Error de autenticación, token inválido!\n" + err);
+            res.status(401).json({
+              resultado: false,
+              mensaje: "Error de autenticación"
+            });
+          } else {
+            if (req.params.fechaOld && req.params.fechaNew) {
+              db.many("SELECT id, nombre FROM tratamientos;")
+                .then(tratamientos => {
+                  if (tratamientos) {
+                      let resultadoTratamientos = [];
+                      let tratamientosListos = 0;
+                      for (const tratamiento of tratamientos) {
+                          let nuevoTrat = {};
+                          nuevoTrat.id = tratamiento.id;
+                          nuevoTrat.nombre = tratamiento.nombre;
+                          db.one('SELECT COUNT(*) cant FROM agenda ' +
+                            'INNER JOIN tratamientos_por_turno ' +
+                            'ON agenda.id = tratamientos_por_turno.id_agenda ' +
+                            'INNER JOIN tratamientos ' +
+                            'ON tratamientos_por_turno.id_tratamiento = tratamientos.id ' +
+                            'WHERE tratamientos.id = $1 AND agenda.fecha >= $2 ' +
+                            'AND agenda.fecha <= $3;', [tratamiento.id, req.params.fechaOld, req.params.fechaNew])
+                            .then(cantidadTrat => {
+                                nuevoTrat.cantidad = cantidadTrat.cant;
+                                tratamientosListos++;
+                                resultadoTratamientos.push(nuevoTrat);
+                                if (tratamientosListos === tratamientos.length) {
+                                    resultadoTratamientos.sort(ordenarId);
+                                    res.json({resultado: true, datos: resultadoTratamientos})
+                                }
+                            })
+                            .catch(function(err) {
+                              console.log(err);
+                              res.status(500).json({ resultado: false, mensaje: err })
+                            })
+                      }
+                  } else {
+                    res.json({ resultado: true, datos: {} })
+                  }
+                })
+                .catch(err => {
+                  console.log(err);
+                  res.status(500).json({ resultado: false, mensaje: err })
+                })
+            } else {
+              console.log("Agenda sin todos los datos necesarios");
+              res.status(400).json({ resultado: false, mensaje: "Faltan parámetros para ver los turnos" })
+            }
+          }
+        });
+      } else {
+        res.status(401).json({
+          resultado: false,
+          mensaje: 'No token provided.'
+        });
+      }
+    }
+
+  function ordenarId(a, b) {
+    if (a.id < b.id) {
+      return -1;
+    }
+    if (a.id > b.id) {
+      return 1;
+    }
+    return 0;
+  }
 
     function traerAgenda(req, res) {
         const token = req.headers['x-access-token'];
