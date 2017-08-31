@@ -142,9 +142,6 @@ app.post('/api/historia', turnos.cargarHistoria);
 app.get('/api/fotos/:id', turnos.verFoto);
 app.put('/api/fotos/:id', turnos.cargarFoto);
 
-const reportingApp = express();
-app.use('/reportes', reportingApp);
-
 app.get('/api', function(req, res) {
     res.json({
         mensaje: "Backend del sistema!!"
@@ -154,6 +151,9 @@ app.get('/api', function(req, res) {
 const server = app.listen(app.get('port'), function() {
     console.log('Backend escuchando en puerto ', app.get('port'));
 });
+
+const reportingApp = express();
+app.use('/reportes', reportingApp);
 
 const jsreport = require('jsreport')({
     express: { app: reportingApp, server: server },
