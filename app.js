@@ -26,14 +26,15 @@ const tratamientos = require('./server/tratamientos')(db, pgp);
 const ctacte = require('./server/cuenta_corriente')(db, pgp);
 const medicosSub = require('./server/medico-sub')(db, pgp);
 
+const reportingApp = express();
+app.use('/reportes', reportingApp);
+
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-access-token");
     res.header("Access-Control-Allow-Methods", "POST, PUT, DELETE, GET, OPTIONS");
     next();
 });
-
-//asd
 
 app.use(bodyParser.json({'type': '*/*', limit: '20mb'}));
 app.use(bodyParser.urlencoded({
@@ -141,9 +142,6 @@ app.get('/api/historia/:id_agenda', turnos.verHistoria);
 app.post('/api/historia', turnos.cargarHistoria);
 app.get('/api/fotos/:id', turnos.verFoto);
 app.put('/api/fotos/:id', turnos.cargarFoto);
-
-const reportingApp = express();
-app.use('/reportes', reportingApp);
 
 app.get('/api', function(req, res) {
     res.json({
