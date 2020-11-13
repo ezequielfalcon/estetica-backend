@@ -1,7 +1,7 @@
 /**
  * Created by eze on 16/01/17.
  */
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 module.exports = function(db) {
