@@ -12,7 +12,7 @@ const cn = {
     password: '1234'
 };
 
-const db = pgp(process.env.DATABASE_URL || cn);
+const db = pgp((process.env.DATABASE_URL || cn) + '?sslmode=require');
 
 const seguridad = require('./server/seguridad.js')(db);
 const usuarios = require('./server/usuarios.js')(db, pgp);
