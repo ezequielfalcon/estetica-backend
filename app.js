@@ -1,8 +1,8 @@
 let express = require('express');
 let app = express();
-let bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 const pgp = require("pg-promise")();
+const cors = require('cors');
 
 const db = pgp(process.env.DATABASE_URL);
 
@@ -21,15 +21,10 @@ const medicosSub = require('./server/medico-sub')(db, pgp);
 const reportingApp = express();
 app.use('/reportes', reportingApp);
 
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-access-token");
-    res.header("Access-Control-Allow-Methods", "POST, PUT, DELETE, GET, OPTIONS");
-    next();
-});
+app.use(cors());
 
-app.use(bodyParser.json({'type': '*/*', limit: '20mb'}));
-app.use(bodyParser.urlencoded({
+app.use(express.json({'type': '*/*', limit: '20mb'}));
+app.use(express.urlencoded({
     extended: true
 }));
 app.use(fileUpload());
