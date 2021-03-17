@@ -4,7 +4,7 @@ const fileUpload = require('express-fileupload');
 const pgp = require("pg-promise")();
 const cors = require('cors');
 
-const db = pgp(process.env.DATABASE_URL);
+const db = pgp(process.env.DATABASE_URL + '?sslmode=require');
 
 const seguridad = require('./server/seguridad.js')(db);
 const usuarios = require('./server/usuarios.js')(db, pgp);
