@@ -4,15 +4,7 @@ let bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 const pgp = require("pg-promise")();
 
-const cn = {
-    host: 'localhost',
-    port: 5432,
-    database: 'estetica',
-    user: 'falco',
-    password: '1234'
-};
-
-const db = pgp((process.env.DATABASE_URL || cn) + '?sslmode=require');
+const db = pgp(process.env.DATABASE_URL);
 
 const seguridad = require('./server/seguridad.js')(db);
 const usuarios = require('./server/usuarios.js')(db, pgp);
